@@ -25,14 +25,15 @@ enemyY = random.randint(50,150)
 enemyXChange = 0.2
 enemyYChange = 10
 
-bulletSprite =  pygame.image.load("assets/bullet_sprite.png")
-bulletX = playerX
-bulletY = playerY
-bulletXChange = 0
-bulletYChange = 0.5
+fireballSprite =  pygame.image.load("assets/fireball_sprite.png")
+fireballX = playerX
+# fireballY has a slight offset
+fireballY = playerY-25
+fireballXChange = 0
+fireballYChange = 0.5
 
 # State variables
-bulletState = "ready"
+fireballState = "ready"
 score = 0
 
 # Display functions
@@ -40,14 +41,14 @@ def player(x,y):
     screen.blit(playerSprite, (x,y))
 def enemy(x,y):
     screen.blit(enemySprite, (x,y))
-def bullet(x,y):
-    global bulletState
-    bulletState = "fire"
-    screen.blit(bulletSprite, (x+16,y-10))
+def fireball(x,y):
+    global fireballState
+    fireballState = "fire"
+    screen.blit(fireballSprite, (x+16,y-10))
 
 # Helpers
-def isCollision(enemyX, enemyY, bulletX, bulletY):
-    distance = math.sqrt(math.pow(enemyX-bulletX,2)+math.pow(enemyY-bulletY,2))
+def isCollision(enemyX, enemyY, fireballX, fireballY):
+    distance = math.sqrt(math.pow(enemyX-fireballX,2)+math.pow(enemyY-fireballY,2))
     if distance < 40:
         return True
     else:
@@ -56,7 +57,7 @@ def isCollision(enemyX, enemyY, bulletX, bulletY):
 # Update cycle
 active = True
 while active:
-    screen.fill([138,43,226])
+    screen.fill([53,69,172])
 
     # Events
     for event in pygame.event.get():
@@ -68,9 +69,10 @@ while active:
             if event.key == pygame.K_RIGHT:
                 playerXChange = .25
             if event.key == pygame.K_SPACE:
-                if bulletState == "ready":
-                    bulletX = playerX
-                    bullet(bulletX,bulletY)
+                if fireballState == "ready":
+                    # fireballX has a slight offset
+                    fireballX = (playerX-15)
+                    fireball(fireballX,fireballY)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 playerXChange = 0
@@ -93,17 +95,17 @@ while active:
     enemy(enemyX, enemyY)
 
 
-    # Bullet logic
-    if bulletY <= 0:
-        bulletY = playerY
-        bulletState = "ready"
-    if bulletState is "fire":
-        bullet(bulletX,bulletY)
-        bulletY -= bulletYChange
-    collision = isCollision(enemyX, enemyY, bulletX, bulletY)
+    # fireball logic
+    if fireballY <= 0:
+        fireballY = playerY
+        fireballState = "ready"
+    if fireballState is "fire":
+        fireball(fireballX,fireballY)
+        fireballY -= fireballYChange
+    collision = isCollision(enemyX, enemyY, fireballX, fireballY)
     if collision:
-        bulletY= playerY
-        bulletState ="ready"
+        fireballY= playerY
+        fireballState ="ready"
         score += 1
         print(score)
         enemyX = random.randint(0,736)
