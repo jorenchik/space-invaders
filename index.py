@@ -6,6 +6,27 @@ import click
 # Clear the console
 click.clear()
 
+class Enemy:
+    def __init__(self, sprite=None, x=None, y=None, xChange=None, yChange=None, skin=None):
+        self.sprite = sprite if sprite else pygame.image.load("assets/enemy_sprite.png")
+        self.x = x if x else random.randint(0,736)
+        self.y = y if y else random.randint(50,150)
+        self.xChange = xChange if xChange else .2
+        self.yChange = yChange if yChange else 10
+        self.skin = skin if skin else 'default'
+    def getDirection(self, x=None):
+        x = x if x else random.randint(-2000,2000)/1000
+        self.xChange = x
+        randInt = random.randint(0,1)
+        yModule = math.sqrt(abs(0.05-pow(x,2)))
+        print(yModule)
+        self.yChange = yModule if randInt == 0 else -yModule
+
+
+
+# Settings
+enemyLimit = 3
+
 # Game initialization
 pygame.init()
 pygame.display.set_caption("Space invaders")
@@ -19,11 +40,11 @@ playerX =  370
 playerY =  580
 playerXChange = 0
 
-enemySprite = pygame.image.load("assets/enemy_sprite.png")
-enemyX = random.randint(0,736)
-enemyY = random.randint(50,150)
-enemyXChange = 0.2
-enemyYChange = 10
+# enemySprite = pygame.image.load("assets/enemy_sprite.png")
+# enemyX = random.randint(0,736)
+# enemyY = random.randint(50,150)
+# enemyXChange = 0.2
+# enemyYChange = 10
 
 fireballSprite =  pygame.image.load("assets/fireball_sprite.png")
 fireballX = playerX
@@ -39,8 +60,8 @@ score = 0
 # Display functions
 def player(x,y):
     screen.blit(playerSprite, (x,y))
-def enemy(x,y):
-    screen.blit(enemySprite, (x,y))
+def moveEnemy(sprite,x,y):
+    screen.blit(sprite, (x,y))
 def fireball(x,y):
     global fireballState
     fireballState = "fire"
@@ -53,6 +74,16 @@ def isCollision(enemyX, enemyY, fireballX, fireballY):
         return True
     else:
         return False
+
+# Create enemies
+enemies = []
+for i in range(0,enemyLimit):
+    enemies.append(Enemy())
+
+# for enemy in enemies:
+#     print(enemy.xChange, enemy.yChange)
+#     print(enemy.xChange, enemy.yChange)
+
 
 # Update cycle
 active = True
@@ -82,33 +113,47 @@ while active:
     player(playerX, playerY)
 
     # Enemy logic
-    enemyX+=enemyXChange
-    enemyY+=enemyYChange
-    if enemyX + enemyXChange >= 736:
-        enemyXChange = -.2
-    if enemyX + enemyXChange <= 0:
-        enemyXChange = .2
-    if enemyY + enemyYChange >= 336:
-        enemyYChange = -.1
-    if enemyY + enemyYChange <= 50:
-        enemyYChange = .1
-    enemy(enemyX, enemyY)
+    for enemy in enemies:
+        enemy.x += enemy.xChange
+        enemy.y += enemy.yChange
+        if enemy.x + enemy.xChange >= 736:
+            enemy.getDirection()
+        if enemy.x + enemy.xChange <= 0:
+            enemy.getDirection()
+        if enemy.y + enemy.yChange >= 336:
+            enemy.getDirection()
+        if enemy.y + enemy.yChange <= 50:
+            enemy.getDirection()
+        moveEnemy(enemy.sprite,enemy.x, enemy.y)
+
+
+    # enemyX+=enemyXChange
+    # enemyY+=enemyYChange
+    # if enemyX + enemyXChange >= 736:
+    #     enemyXChange = -.2
+    # if enemyX + enemyXChange <= 0:
+    #     enemyXChange = .2
+    # if enemyY + enemyYChange >= 336:
+    #     enemyYChange = -.1
+    # if enemyY + enemyYChange <= 50:
+    #     enemyYChange = .1
+    # enemy(enemyX, enemyY)
 
 
     # fireball logic
-    if fireballY <= 0:
-        fireballY = playerY
-        fireballState = "ready"
-    if fireballState is "fire":
-        fireball(fireballX,fireballY)
-        fireballY -= fireballYChange
-    collision = isCollision(enemyX, enemyY, fireballX, fireballY)
-    if collision:
-        fireballY= playerY
-        fireballState ="ready"
-        score += 1
-        print(score)
-        enemyX = random.randint(0,736)
-        enemyY = random.randint(50,150)
+    # if fireballY <= 0:
+    #     fireballY = playerY
+    #     fireballState = "ready"
+    # if fireballState is "fire":
+    #     fireball(fireballX,fireballY)
+    #     fireballY -= fireballYChange
+    # collision = isCollision(enemyX, enemyY, fireballX, fireballY)
+    # if collision:
+    #     fireballY= playerY
+    #     fireballState ="ready"
+    #     score += 1
+    #     print(score)
+    #     enemyX = random.randint(0,736)
+    #     enemyY = random.randint(50,150)
             
     pygame.display.update()
