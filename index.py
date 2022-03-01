@@ -1,3 +1,4 @@
+from turtle import speed
 import pygame
 import math
 import random
@@ -41,6 +42,22 @@ class Enemy:
             return 'y'
         return False
 
+class Player:
+    pos = pygame.Vector2((370,580))
+    speed = pygame.Vector2((0,0))
+    sprite = pygame.image.load("assets/player_sprite.png")
+    def move(self,x,y):
+        screen.blit(self.sprite, (x,y))
+    def changeSpeedX(self, x):
+        self.speed.x = x
+    def checkBorderCollision(self):
+        if self.pos.x + self.speed.x >= 736:
+            return True
+        if self.pos.x + self.speed.x <= 0:
+            return True
+        return False
+
+
 # Settings
 enemyLimit = 7
 
@@ -51,31 +68,6 @@ gameIcon = pygame.image.load("assets/icon.ico")
 screen = pygame.display.set_mode((800,800))
 screenImage = pygame.image.load("assets/screen.png")
 
-# SPRITES
-playerSprite = pygame.image.load("assets/player_sprite.png")
-playerX =  370
-playerY =  580
-playerXChange = 0
-
-fireballSprite =  pygame.image.load("assets/fireball_sprite.png")
-fireballX = playerX
-# fireballY has a slight offset
-fireballY = playerY-25
-fireballXChange = 0
-fireballYChange = 0.5
-
-# State variables
-fireballState = "ready"
-score = 0
-
-# Display functions
-def player(x,y):
-    screen.blit(playerSprite, (x,y))
-def fireball(x,y):
-    global fireballState
-    fireballState = "fire"
-    screen.blit(fireballSprite, (x+16,y-10))
-
 # Helpers
 def isCollision(enemyX, enemyY, fireballX, fireballY):
     distance = math.sqrt(math.pow(enemyX-fireballX,2)+math.pow(enemyY-fireballY,2))
@@ -84,37 +76,56 @@ def isCollision(enemyX, enemyY, fireballX, fireballY):
     else:
         return False
 
-# Create enemies
+# Create entities
 enemies = []
 for i in range(0,enemyLimit):
     enemies.append(Enemy())
+player = Player()
+
+fireballSprite =  pygame.image.load("assets/fireball_sprite.png")
+fireballX = player.pos.x
+# fireballY has a slight offset
+fireballY = player.pos.x-25
+fireballXChange = 0
+fireballYChange = 0.5
+
+# State variables
+fireballState = "ready"
+score = 0
+
+# Display functions
+def fireball(x,y):
+    global fireballState
+    fireballState = "fire"
+    screen.blit(fireballSprite, (x+16,y-10))
 
 # Update cycle
 active = True
 while active:
     screen.fill([53,69,172])
 
-    # Events
+    # Player logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             active = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                playerXChange = -.25
+                player.changeSpeedX(-.25)
             if event.key == pygame.K_RIGHT:
-                playerXChange = .25
+                player.changeSpeedX(.25)
             if event.key == pygame.K_SPACE:
                 if fireballState == "ready":
                     # fireballX has a slight offset
-                    fireballX = (playerX-15)
+                    fireballX = (player.pos.x-15)
                     fireball(fireballX,fireballY)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                playerXChange = 0
+                player.changeSpeedX(0)
 
-    if (playerX + playerXChange > 0) and (playerX + playerXChange < 736):
-        playerX += playerXChange
-    player(playerX, playerY)
+    playerBorderCollision = player.checkBorderCollision()
+    if not playerBorderCollision:
+        player.pos.x += player.speed.x
+    player.move(player.pos.x, player.pos.y)
 
     # Enemy logic
     for enemy in enemies:
