@@ -14,7 +14,7 @@ assets = pathlib.Path(absPath/'assets')
 enemySprites = list(assets.glob("enemy_*.png"))
 
 class Enemy:
-    def __init__(self, sprite=None, x=None, y=None, xChange=None, yChange=None, skin=None):
+    def __init__(self, sprite=None, x=None, y=None, xChange=None, yChange=None):
         spriteIndex = random.randint(0, len(enemySprites)-1)
         sprite = sprite if sprite else enemySprites[spriteIndex]
         self.sprite = pygame.image.load(sprite)
@@ -26,7 +26,6 @@ class Enemy:
         self.y = y if y else random.randint(50,150)
         self.xChange = xChange if xChange else .2
         self.yChange = yChange if yChange else .1
-        self.skin = skin if skin else 'default'
     def move(self,x,y):
         screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
@@ -56,6 +55,7 @@ class Player:
         if self.pos.x + self.speed.x <= 0:
             return True
         return False
+        
 
 
 # Settings
