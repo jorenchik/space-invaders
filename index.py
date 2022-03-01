@@ -11,8 +11,6 @@ class Enemy:
         self.sprite = sprite if sprite else pygame.image.load("assets/enemy_sprite.png")
         self.pos = pygame.Vector2(x if x else random.randint(0,736), y if y else random.randint(50,150))
         speedModule = math.sqrt(pow(.2, 2)+pow(.1,2))
-        print(speedModule)
-        # self.speed = pygame.Vector2((xChange if xChange else .2, yChange if yChange else .1))
         angle = random.uniform(0, 2.0*math.pi)
         self.speed = pygame.Vector2([speedModule* math.cos(angle), speedModule * math.sin(angle)]) 
         self.x = x if x else random.randint(0,736)
@@ -36,7 +34,7 @@ class Enemy:
         return False
 
 # Settings
-enemyLimit = 3
+enemyLimit = 4
 
 # Game initialization
 pygame.init()
