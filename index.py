@@ -1,3 +1,4 @@
+from turtle import speed
 import pygame
 import math
 import random
@@ -9,20 +10,31 @@ click.clear()
 class Enemy:
     def __init__(self, sprite=None, x=None, y=None, xChange=None, yChange=None, skin=None):
         self.sprite = sprite if sprite else pygame.image.load("assets/enemy_sprite.png")
+        self.pos = pygame.Vector2(x if x else random.randint(0,736), y if y else random.randint(50,150))
+        speedModule = math.sqrt(pow(.2, 2)+pow(.1,2))
+        print(speedModule)
+        # self.speed = pygame.Vector2((xChange if xChange else .2, yChange if yChange else .1))
+        angle = random.uniform(0, 2.0*math.pi)
+        self.speed = pygame.Vector2([speedModule* math.cos(angle), speedModule * math.sin(angle)]) 
         self.x = x if x else random.randint(0,736)
         self.y = y if y else random.randint(50,150)
         self.xChange = xChange if xChange else .2
-        self.yChange = yChange if yChange else 10
+        self.yChange = yChange if yChange else .1
         self.skin = skin if skin else 'default'
-    def getDirection(self, x=None):
-        x = x if x else random.randint(-2000,2000)/1000
-        self.xChange = x
-        randInt = random.randint(0,1)
-        yModule = math.sqrt(abs(0.05-pow(x,2)))
-        print(yModule)
-        self.yChange = yModule if randInt == 0 else -yModule
-
-
+    def move(self,x,y):
+        screen.blit(self.sprite, (x,y))
+    def changeDirectionSymmetrically(self, ax):
+        self.speed = pygame.Vector2((-self.speed.x, self.speed.y)) if ax == 'x' else pygame.Vector2((self.speed.x, -self.speed.y))
+    def checkBorderCollision(self):
+        if self.pos.x + self.speed.x >= 736:
+            return 'x'
+        if self.pos.x + self.speed.x <= 0:
+            return 'x'
+        if self.pos.y + self.speed.y >= 336:
+            return 'y'
+        if self.pos.y + self.speed.y <= 50:
+            return 'y'
+        return False
 
 # Settings
 enemyLimit = 3
@@ -40,12 +52,6 @@ playerX =  370
 playerY =  580
 playerXChange = 0
 
-# enemySprite = pygame.image.load("assets/enemy_sprite.png")
-# enemyX = random.randint(0,736)
-# enemyY = random.randint(50,150)
-# enemyXChange = 0.2
-# enemyYChange = 10
-
 fireballSprite =  pygame.image.load("assets/fireball_sprite.png")
 fireballX = playerX
 # fireballY has a slight offset
@@ -60,8 +66,6 @@ score = 0
 # Display functions
 def player(x,y):
     screen.blit(playerSprite, (x,y))
-def moveEnemy(sprite,x,y):
-    screen.blit(sprite, (x,y))
 def fireball(x,y):
     global fireballState
     fireballState = "fire"
@@ -79,11 +83,6 @@ def isCollision(enemyX, enemyY, fireballX, fireballY):
 enemies = []
 for i in range(0,enemyLimit):
     enemies.append(Enemy())
-
-# for enemy in enemies:
-#     print(enemy.xChange, enemy.yChange)
-#     print(enemy.xChange, enemy.yChange)
-
 
 # Update cycle
 active = True
@@ -114,30 +113,12 @@ while active:
 
     # Enemy logic
     for enemy in enemies:
-        enemy.x += enemy.xChange
-        enemy.y += enemy.yChange
-        if enemy.x + enemy.xChange >= 736:
-            enemy.getDirection()
-        if enemy.x + enemy.xChange <= 0:
-            enemy.getDirection()
-        if enemy.y + enemy.yChange >= 336:
-            enemy.getDirection()
-        if enemy.y + enemy.yChange <= 50:
-            enemy.getDirection()
-        moveEnemy(enemy.sprite,enemy.x, enemy.y)
-
-
-    # enemyX+=enemyXChange
-    # enemyY+=enemyYChange
-    # if enemyX + enemyXChange >= 736:
-    #     enemyXChange = -.2
-    # if enemyX + enemyXChange <= 0:
-    #     enemyXChange = .2
-    # if enemyY + enemyYChange >= 336:
-    #     enemyYChange = -.1
-    # if enemyY + enemyYChange <= 50:
-    #     enemyYChange = .1
-    # enemy(enemyX, enemyY)
+        enemy.pos.x += enemy.speed.x
+        enemy.pos.y += enemy.speed.y
+        borderCollision = enemy.checkBorderCollision()
+        if(borderCollision):
+            enemy.changeDirectionSymmetrically(borderCollision)
+        enemy.move(enemy.pos.x, enemy.pos.y)
 
 
     # fireball logic
