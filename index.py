@@ -2,13 +2,21 @@ import pygame
 import math
 import random
 import click
+import pathlib
 
 # Clear the console
 click.clear()
 
+# Enemy sprite load
+absPath = pathlib.Path.cwd()
+assets = pathlib.Path(absPath/'assets')
+enemySprites = list(assets.glob("enemy_*.png"))
+
 class Enemy:
     def __init__(self, sprite=None, x=None, y=None, xChange=None, yChange=None, skin=None):
-        self.sprite = sprite if sprite else pygame.image.load("assets/enemy_sprite.png")
+        spriteIndex = random.randint(0, len(enemySprites)-1)
+        sprite = sprite if sprite else enemySprites[spriteIndex]
+        self.sprite = pygame.image.load(sprite)
         self.pos = pygame.Vector2(x if x else random.randint(0,736), y if y else random.randint(50,150))
         speedModule = math.sqrt(pow(.2, 2)+pow(.1,2))
         angle = random.uniform(0, 2.0*math.pi)
@@ -34,7 +42,7 @@ class Enemy:
         return False
 
 # Settings
-enemyLimit = 4
+enemyLimit = 7
 
 # Game initialization
 pygame.init()
