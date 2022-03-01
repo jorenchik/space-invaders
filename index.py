@@ -1,3 +1,4 @@
+from re import X
 from turtle import speed
 import pygame
 import math
@@ -96,6 +97,13 @@ def isCollision(obj1, obj2, distance):
         return True
     return False
 
+def changeXPos(obj, x):
+    obj.pos.x += x
+
+def changeYPos(obj, y):
+    obj.pos.y += y
+
+
 # State 
 fireballState = 'ready'
 score = 0
@@ -126,13 +134,13 @@ while active:
 
     playerBorderCollision = player.checkBorderCollision()
     if not playerBorderCollision:
-        player.pos.x += player.speed.x
+        changeXPos(player, player.speed.x)
     player.move(player.pos.x, player.pos.y)
 
     # Enemy logic
     for enemy in enemies:
-        enemy.pos.x += enemy.speed.x
-        enemy.pos.y += enemy.speed.y
+        changeXPos(enemy, enemy.speed.x)
+        changeYPos(enemy, enemy.speed.y)
         borderCollision = enemy.checkBorderCollision()
         if(borderCollision):
             enemy.changeDirectionSymmetrically(borderCollision)
@@ -144,7 +152,7 @@ while active:
         fireball.state = 'ready'
     if fireball.state == 'fire':
         fireball.move(fireball.pos.x, fireball.pos.y)
-        fireball.pos.y += fireball.speed.y
+        changeYPos(fireball, fireball.speed.y)
     colidedEnemies = []
     for enemy in enemies:
         if isCollision(fireball, enemy, 27):
