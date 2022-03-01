@@ -6,6 +6,9 @@ import random
 import click
 import pathlib
 
+clock = pygame.time.Clock()
+
+
 # Clear the console
 click.clear()
 
@@ -13,6 +16,12 @@ click.clear()
 absPath = pathlib.Path.cwd()
 assets = pathlib.Path(absPath/'assets')
 enemySprites = list(assets.glob("enemy_*.png"))
+
+# Settings
+enemyLimit = 7
+
+startEnemyX = 50
+endEnemyY = 150
 
 class Enemy:
     def __init__(self, sprite=None, pos=None, speed=None):
@@ -25,7 +34,7 @@ class Enemy:
         else:
             x = None
             y = None
-        self.pos = pygame.Vector2(x if x else random.randint(0,736), y if y else random.randint(50,150))
+        self.pos = pygame.Vector2(x if x else random.randint(0,736), y if y else random.randint(startEnemyX,endEnemyY))
         if speed:
             xSpeed = speed.x
             ySpeed = speed.y
@@ -74,8 +83,7 @@ class Fireball:
     def move(self,x,y):
         screen.blit(self.sprite, (x,y))
 
-# Settings
-enemyLimit = 7
+
 
 # Game initialization
 pygame.init()
@@ -97,10 +105,10 @@ def isCollision(obj1, obj2, distance):
         return True
     return False
 
-def changeXPos(obj, x):
+def changeXPos(obj, x, dt):
     obj.pos.x += x
 
-def changeYPos(obj, y):
+def changeYPos(obj, y, dt):
     obj.pos.y += y
 
 
@@ -111,6 +119,7 @@ score = 0
 # Update cycle
 active = True
 while active:
+    dt = 0
     screen.fill([53,69,172])
 
     # Player logic
@@ -134,13 +143,13 @@ while active:
 
     playerBorderCollision = player.checkBorderCollision()
     if not playerBorderCollision:
-        changeXPos(player, player.speed.x)
+        changeXPos(player, player.speed.x,dt)
     player.move(player.pos.x, player.pos.y)
 
     # Enemy logic
     for enemy in enemies:
-        changeXPos(enemy, enemy.speed.x)
-        changeYPos(enemy, enemy.speed.y)
+        changeXPos(enemy, enemy.speed.x,dt)
+        changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
         if(borderCollision):
             enemy.changeDirectionSymmetrically(borderCollision)
@@ -152,7 +161,7 @@ while active:
         fireball.state = 'ready'
     if fireball.state == 'fire':
         fireball.move(fireball.pos.x, fireball.pos.y)
-        changeYPos(fireball, fireball.speed.y)
+        changeYPos(fireball, fireball.speed.y,dt)
     colidedEnemies = []
     for enemy in enemies:
         if isCollision(fireball, enemy, 27):
