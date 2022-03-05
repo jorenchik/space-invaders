@@ -21,7 +21,7 @@ enemySprites = list(assets.glob("enemy_*.png"))
 
 # Settings
 fpsLimit = 60
-enemyLimit = 5
+enemyLimit = 2
 startEnemyX = 30
 startEnemyY = 50
 endEnemyY = 410
@@ -31,11 +31,11 @@ enemyCollisionYStart = 0
 enemyCollisionYEnd = 600
 enemyCollisionXStart = 0
 enemyCollisionXEnd = 736
-enemyDefaultXSpeed = .2
-enemyDefaultYSpeed = .1
-enemySpeed = 10
+playerCollisionXStart = 0
+playerCollisionXEnd = 736
+enemySpeed = 2
 fireballSpeed = 8
-playerSpeed = 5
+playerSpeed = 3
 
 # Enemy starting positions
 def getNeighbours(i, n, arr):
@@ -96,35 +96,16 @@ if(enemyLimit>0):
 
 
 class Enemy:
-    def __init__(self,index,sprite=None, pos=None, speed=None):
+    def __init__(self,index):
         self.index = index
         spriteIndex = random.randint(0, len(enemySprites)-1)
-        sprite = sprite if sprite else enemySprites[spriteIndex]
+        sprite = enemySprites[spriteIndex]
         self.sprite = pygame.image.load(sprite)
-        if pos:
-            x = pos.x
-            y = pos.y
-        else:
-            x = None
-            y = None
         for i, row in enumerate(positions):
             if self.index in row:
                 position = [i, row.index(self.index)]
-        self.pos = pygame.Vector2(x if x else position[1]*(64+enemyXGap)+startEnemyX, y if y else position[0]*(64+enemyXGap)+startEnemyY)
-        if speed:
-            customSpeed = True
-            xSpeed = speed.x*enemySpeed
-            ySpeed = speed.y*enemySpeed
-        else:
-            customSpeed = None
-            xSpeed = None
-            ySpeed = None
-        angle = random.uniform(0, 2.0*math.pi)
-        if customSpeed:
-            self.speed = pygame.Vector2([xSpeed, ySpeed]) 
-        else:
-            speedModule = math.sqrt(pow(xSpeed if xSpeed else .2*enemySpeed, 2)+pow(ySpeed if ySpeed  else .1*enemySpeed,2))
-            self.speed = pygame.Vector2([speedModule* math.cos(angle), speedModule * math.sin(angle)]) 
+        self.pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
+        self.speed = pygame.Vector2([1*enemySpeed, 0*enemySpeed]) 
     def move(self,x,y):
         screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
@@ -159,9 +140,9 @@ class Player:
     def changeSpeedX(self, x):
         self.speed.x = x
     def checkBorderCollision(self):
-        if self.pos.x + self.speed.x >= 736:
+        if self.pos.x + self.speed.x <= playerCollisionXStart:
             return True
-        if self.pos.x + self.speed.x <= 0:
+        if self.pos.x + self.speed.x >= playerCollisionXEnd:
             return True
         return False
         
@@ -184,23 +165,20 @@ screenImage = pygame.image.load("assets/screen.png")
 
 
 # Create entities
-speedModule = math.sqrt(pow(enemyDefaultXSpeed, 2)+pow(enemyDefaultYSpeed,2))
-enemyCommonSpeed = pygame.Vector2((speedModule, 0))
 enemies = []
 for i in range(0,enemyLimit):
-    enemies.append(Enemy(i+1,None,None,enemyCommonSpeed))
+    enemies.append(Enemy(i+1))
 player = Player()
 fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0, -fireballSpeed))
 
 
+# Helpers
 def isCollision(obj1, obj2, distance):
     if obj1.pos.distance_to(obj2.pos) <= distance:
         return True
     return False
-
 def changeXPos(obj, x, dt):
     obj.pos.x += x
-
 def changeYPos(obj, y, dt):
     obj.pos.y += y
 
