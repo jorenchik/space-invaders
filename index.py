@@ -8,7 +8,6 @@ import pathlib
 
 clock = pygame.time.Clock()
 
-
 # Clear the console
 click.clear()
 
@@ -19,9 +18,62 @@ enemySprites = list(assets.glob("enemy_*.png"))
 
 # Settings
 enemyLimit = 7
+startEnemyY = 50
+endEnemyY = 410
+enemyLeftBorder = 3
+enemyRightBorder = 733
+enemiesXPadding = 30
+enemiesYPadding = 0
+enemyDefaultXSpeed = .2
+enemyDefaultYSpeed = .1
+enemySpeedMultiplier = 5
 
-startEnemyX = 50
-endEnemyY = 150
+# Calculate enemy positions
+def getNeighbours(i, n, arr):
+    neighbours = []
+    try:
+        if(arr[i-1][n] == 0):
+            neighbours.append([i-1,n])
+    except:
+        print()
+    try:
+        if(arr[i+1][n] == 0):
+            neighbours.append([i+1,n])
+    except:
+        print()
+    try:
+        if(arr[i][n-1] == 0):
+            neighbours.append([i,n-1])
+    except:
+        print()
+    try:
+        if(arr[i][n+1] == 0):
+            neighbours.append([i,n+1])
+    except:
+        print() 
+    return neighbours
+
+rows = 5
+cols = 10
+
+pos = a = [[0 for x in range(cols)] for x in range(rows)]
+enemyCount = 0
+if(enemyLimit>0):
+    num = 1
+    pos[2][4] = num
+    neighbours = getNeighbours(2,4,pos)
+    while num <= enemyLimit and len(neighbours)>0:
+        i = neighbours[0][0]
+        n = neighbours[0][1]
+        num += 1
+        pos[i][n]=num
+        if len(neighbours) > 1:
+            neighbours.remove(neighbours[0])
+        else:
+            current = neighbours[0]
+            # neighbours = [neighbours[0]]+getNeighbours(current[0], current[1], pos)
+            neighbours = getNeighbours(current[0], current[1], pos)
+
 
 class Enemy:
     def __init__(self, sprite=None, pos=None, speed=None):
@@ -34,16 +86,21 @@ class Enemy:
         else:
             x = None
             y = None
-        self.pos = pygame.Vector2(x if x else random.randint(0,736), y if y else random.randint(startEnemyX,endEnemyY))
+        self.pos = pygame.Vector2(x if x else random.randint(enemyLeftBorder+enemiesXPadding,enemyRightBorder-enemiesXPadding), y if y else random.randint(startEnemyY+enemiesXPadding,endEnemyY-enemiesYPadding))
         if speed:
-            xSpeed = speed.x
-            ySpeed = speed.y
+            customSpeed = True
+            xSpeed = speed.x*enemySpeedMultiplier
+            ySpeed = speed.y*enemySpeedMultiplier
         else:
+            customSpeed = None
             xSpeed = None
             ySpeed = None
-        speedModule = math.sqrt(pow(xSpeed if xSpeed else .2, 2)+pow(ySpeed if ySpeed  else .1,2))
         angle = random.uniform(0, 2.0*math.pi)
-        self.speed = pygame.Vector2([speedModule* math.cos(angle), speedModule * math.sin(angle)]) 
+        if customSpeed:
+            self.speed = pygame.Vector2([xSpeed, ySpeed]) 
+        else:
+            speedModule = math.sqrt(pow(xSpeed if xSpeed else .2*enemySpeedMultiplier, 2)+pow(ySpeed if ySpeed  else .1*enemySpeedMultiplier,2))
+            self.speed = pygame.Vector2([speedModule* math.cos(angle), speedModule * math.sin(angle)]) 
     def move(self,x,y):
         screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
@@ -84,7 +141,6 @@ class Fireball:
         screen.blit(self.sprite, (x,y))
 
 
-
 # Game initialization
 pygame.init()
 pygame.display.set_caption("Space invaders")
@@ -94,11 +150,14 @@ screenImage = pygame.image.load("assets/screen.png")
 
 
 # Create entities
+speedModule = math.sqrt(pow(enemyDefaultXSpeed, 2)+pow(enemyDefaultYSpeed,2))
+enemyCommonSpeed = pygame.Vector2((speedModule, 0))
 enemies = []
 for i in range(0,enemyLimit):
-    enemies.append(Enemy())
+    enemies.append(Enemy(None,None,enemyCommonSpeed))
 player = Player()
 fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0, -.5))
+
 
 def isCollision(obj1, obj2, distance):
     if obj1.pos.distance_to(obj2.pos) <= distance:
