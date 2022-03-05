@@ -6,6 +6,7 @@ import math
 import random
 import click
 import pathlib
+import time
 
 clock = pygame.time.Clock()
 
@@ -18,7 +19,7 @@ assets = pathlib.Path(absPath/'assets')
 enemySprites = list(assets.glob("enemy_*.png"))
 
 # Settings
-enemyLimit = 50
+enemyLimit = 2
 startEnemyX = 30
 startEnemyY = 50
 endEnemyY = 410
@@ -27,7 +28,7 @@ enemyYGap = 5
 enemiesXPadding = 30
 enemyDefaultXSpeed = .2
 enemyDefaultYSpeed = .1
-enemySpeedMultiplier = 2
+enemySpeedMultiplier = 10
 
 # Calculate enemy positions
 def getNeighbours(i, n, arr):
@@ -56,8 +57,7 @@ def getNeighbours(i, n, arr):
 
 rows = 5
 cols = 10
-
-positions = a = [[0 for x in range(cols)] for x in range(rows)]
+positions = [[0 for x in range(cols)] for x in range(rows)]
 enemyCount = 0
 if(enemyLimit>0):
     num = 1
@@ -130,11 +130,21 @@ class Enemy:
             return 'x'
         if self.pos.x + self.speed.x <= 0:
             return 'x'
-        if self.pos.y + self.speed.y >= 336:
+        if self.pos.y + self.speed.y >= 600:
             return 'y'
-        if self.pos.y + self.speed.y <= 50:
+        if self.pos.y + self.speed.y <= 0:
             return 'y'
         return False
+
+def checkEnemyGroupCollision(group):
+    enemiesCollided = []
+    for enemy in group:
+        collision = enemy.checkBorderCollision()
+        if collision:
+            enemiesCollided.append(enemy)
+    if len(enemiesCollided) > 0:
+        return True
+    return False
 
 class Player:
     pos = pygame.Vector2((370,580))
@@ -194,6 +204,8 @@ def changeYPos(obj, y, dt):
 # State 
 fireballState = 'ready'
 score = 0
+leftTouched = False
+rightTouched = False
 
 # Update cycle
 active = True
@@ -225,13 +237,17 @@ while active:
         changeXPos(player, player.speed.x,dt)
     player.move(player.pos.x, player.pos.y)
 
+    groupCollision = checkEnemyGroupCollision(enemies)
+
     # Enemy logic
     for enemy in enemies:
         changeXPos(enemy, enemy.speed.x,dt)
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
-        if(borderCollision):
-            enemy.changeDirectionSymmetrically(borderCollision)
+        # if(borderCollision):
+        #         enemy.changeDirectionSymmetrically(borderCollision)
+        if(groupCollision):
+                enemy.changeDirectionSymmetrically('x')
         enemy.move(enemy.pos.x, enemy.pos.y)
 
     # Fireball logic
@@ -243,7 +259,7 @@ while active:
         changeYPos(fireball, fireball.speed.y,dt)
     colidedEnemies = []
     for enemy in enemies:
-        if isCollision(fireball, enemy, 27):
+        if isCollision(fireball, enemy, 50):
             colidedEnemies.append(enemy)
     if(len(colidedEnemies) > 0):
         fireball.pos.y = player.pos.y
