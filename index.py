@@ -8,6 +8,7 @@ import click
 import pathlib
 import time
 
+# Initialize clock for dt and limiting the framerate
 clock = pygame.time.Clock()
 
 # Clear the console
@@ -19,7 +20,8 @@ assets = pathlib.Path(absPath/'assets')
 enemySprites = list(assets.glob("enemy_*.png"))
 
 # Settings
-enemyLimit = 2
+fpsLimit = 60
+enemyLimit = 5
 startEnemyX = 30
 startEnemyY = 50
 endEnemyY = 410
@@ -29,6 +31,8 @@ enemiesXPadding = 30
 enemyDefaultXSpeed = .2
 enemyDefaultYSpeed = .1
 enemySpeedMultiplier = 10
+fireballSpeed = 10
+playerSpeed = 5
 
 # Calculate enemy positions
 def getNeighbours(i, n, arr):
@@ -186,7 +190,7 @@ enemies = []
 for i in range(0,enemyLimit):
     enemies.append(Enemy(i+1,None,None,enemyCommonSpeed))
 player = Player()
-fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0, -.5))
+fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0, -fireballSpeed))
 
 
 def isCollision(obj1, obj2, distance):
@@ -200,7 +204,6 @@ def changeXPos(obj, x, dt):
 def changeYPos(obj, y, dt):
     obj.pos.y += y
 
-
 # State 
 fireballState = 'ready'
 score = 0
@@ -209,19 +212,25 @@ rightTouched = False
 
 # Update cycle
 active = True
+prevTime = time.time()
 while active:
-    dt = 0
     screen.fill([53,69,172])
 
-    # Player logic
+    # Calculates deltatime
+    clock.tick(fpsLimit)
+    now = time.time()
+    dt = (now - prevTime) * 1000
+    prevTime = now
+
+    # Player/event logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             active = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                player.changeSpeedX(-.25)
+                player.changeSpeedX(-playerSpeed)
             if event.key == pygame.K_RIGHT:
-                player.changeSpeedX(.25)
+                player.changeSpeedX(playerSpeed)
             if event.key == pygame.K_SPACE:
                 if fireball.state == "ready":
                     # fireballX has a slight offset
@@ -231,21 +240,17 @@ while active:
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 player.changeSpeedX(0)
-
     playerBorderCollision = player.checkBorderCollision()
     if not playerBorderCollision:
         changeXPos(player, player.speed.x,dt)
     player.move(player.pos.x, player.pos.y)
 
-    groupCollision = checkEnemyGroupCollision(enemies)
-
     # Enemy logic
+    groupCollision = checkEnemyGroupCollision(enemies)
     for enemy in enemies:
         changeXPos(enemy, enemy.speed.x,dt)
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
-        # if(borderCollision):
-        #         enemy.changeDirectionSymmetrically(borderCollision)
         if(groupCollision):
                 enemy.changeDirectionSymmetrically('x')
         enemy.move(enemy.pos.x, enemy.pos.y)
