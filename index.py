@@ -18,16 +18,16 @@ assets = pathlib.Path(absPath/'assets')
 enemySprites = list(assets.glob("enemy_*.png"))
 
 # Settings
-enemyLimit = 10
+enemyLimit = 50
+startEnemyX = 30
 startEnemyY = 50
 endEnemyY = 410
-enemyLeftBorder = 3
-enemyRightBorder = 733
+enemyXGap = 5
+enemyYGap = 5
 enemiesXPadding = 30
-enemiesYPadding = 0
 enemyDefaultXSpeed = .2
 enemyDefaultYSpeed = .1
-enemySpeedMultiplier = 1
+enemySpeedMultiplier = 2
 
 # Calculate enemy positions
 def getNeighbours(i, n, arr):
@@ -56,28 +56,27 @@ def getNeighbours(i, n, arr):
 
 rows = 5
 cols = 10
-enemyGap = 10
 
-pos = a = [[0 for x in range(cols)] for x in range(rows)]
+positions = a = [[0 for x in range(cols)] for x in range(rows)]
 enemyCount = 0
 if(enemyLimit>0):
     num = 1
-    pos[2][4] = num
-    neighbours = getNeighbours(2,4,pos)
+    positions[2][4] = num
+    neighbours = getNeighbours(2,4,positions)
     while num <= enemyLimit and len(neighbours)>0:
         i = neighbours[0][0]
         n = neighbours[0][1]
         num += 1
-        pos[i][n]=num
+        positions[i][n]=num
         if len(neighbours) > 1:
             neighbours.remove(neighbours[0])
         else:
             current = neighbours[0]
-            neighbours = getNeighbours(current[0], current[1], pos)
+            neighbours = getNeighbours(current[0], current[1], positions)
             if len(neighbours) == 0:
                 break
     unfilledPositions = []
-    for i, row in enumerate(pos):
+    for i, row in enumerate(positions):
         zeros = [i for i, x in enumerate(row) if x == 0]
         for ind, v in enumerate(zeros):
             unfilledPositions.append([i, ind])
@@ -85,13 +84,16 @@ if(enemyLimit>0):
         unfilledPositionCount = enemyLimit - num
         for i in range(0, unfilledPositionCount):
             randomPos = random.choice(unfilledPositions)
-            pos[randomPos[0]][randomPos[1]] = num
+            positions[randomPos[0]][randomPos[1]] = num+1
             unfilledPositions.remove(randomPos)
             num += 1
 
+# print(positions)
+# exit()
 
 class Enemy:
-    def __init__(self, sprite=None, pos=None, speed=None):
+    def __init__(self,index,sprite=None, pos=None, speed=None):
+        self.index = index
         spriteIndex = random.randint(0, len(enemySprites)-1)
         sprite = sprite if sprite else enemySprites[spriteIndex]
         self.sprite = pygame.image.load(sprite)
@@ -101,7 +103,10 @@ class Enemy:
         else:
             x = None
             y = None
-        self.pos = pygame.Vector2(x if x else random.randint(enemyLeftBorder+enemiesXPadding,enemyRightBorder-enemiesXPadding), y if y else random.randint(startEnemyY+enemiesXPadding,endEnemyY-enemiesYPadding))
+        for i, row in enumerate(positions):
+            if self.index in row:
+                position = [i, row.index(self.index)]
+        self.pos = pygame.Vector2(x if x else position[1]*(64+enemyXGap)+startEnemyX, y if y else position[0]*(64+enemyXGap)+startEnemyY)
         if speed:
             customSpeed = True
             xSpeed = speed.x*enemySpeedMultiplier
@@ -169,7 +174,7 @@ speedModule = math.sqrt(pow(enemyDefaultXSpeed, 2)+pow(enemyDefaultYSpeed,2))
 enemyCommonSpeed = pygame.Vector2((speedModule, 0))
 enemies = []
 for i in range(0,enemyLimit):
-    enemies.append(Enemy(None,None,enemyCommonSpeed))
+    enemies.append(Enemy(i+1,None,None,enemyCommonSpeed))
 player = Player()
 fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0, -.5))
 
