@@ -1,5 +1,6 @@
 from re import X
 from turtle import speed
+from numpy import empty
 import pygame
 import math
 import random
@@ -17,7 +18,7 @@ assets = pathlib.Path(absPath/'assets')
 enemySprites = list(assets.glob("enemy_*.png"))
 
 # Settings
-enemyLimit = 7
+enemyLimit = 10
 startEnemyY = 50
 endEnemyY = 410
 enemyLeftBorder = 3
@@ -26,7 +27,7 @@ enemiesXPadding = 30
 enemiesYPadding = 0
 enemyDefaultXSpeed = .2
 enemyDefaultYSpeed = .1
-enemySpeedMultiplier = 5
+enemySpeedMultiplier = 1
 
 # Calculate enemy positions
 def getNeighbours(i, n, arr):
@@ -55,6 +56,7 @@ def getNeighbours(i, n, arr):
 
 rows = 5
 cols = 10
+enemyGap = 10
 
 pos = a = [[0 for x in range(cols)] for x in range(rows)]
 enemyCount = 0
@@ -71,8 +73,21 @@ if(enemyLimit>0):
             neighbours.remove(neighbours[0])
         else:
             current = neighbours[0]
-            # neighbours = [neighbours[0]]+getNeighbours(current[0], current[1], pos)
             neighbours = getNeighbours(current[0], current[1], pos)
+            if len(neighbours) == 0:
+                break
+    unfilledPositions = []
+    for i, row in enumerate(pos):
+        zeros = [i for i, x in enumerate(row) if x == 0]
+        for ind, v in enumerate(zeros):
+            unfilledPositions.append([i, ind])
+    if num < enemyLimit:
+        unfilledPositionCount = enemyLimit - num
+        for i in range(0, unfilledPositionCount):
+            randomPos = random.choice(unfilledPositions)
+            pos[randomPos[0]][randomPos[1]] = num
+            unfilledPositions.remove(randomPos)
+            num += 1
 
 
 class Enemy:
