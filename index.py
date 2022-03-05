@@ -27,14 +27,17 @@ startEnemyY = 50
 endEnemyY = 410
 enemyXGap = 5
 enemyYGap = 5
-enemiesXPadding = 30
+enemyCollisionYStart = 0
+enemyCollisionYEnd = 600
+enemyCollisionXStart = 0
+enemyCollisionXEnd = 736
 enemyDefaultXSpeed = .2
 enemyDefaultYSpeed = .1
-enemySpeedMultiplier = 10
-fireballSpeed = 10
+enemySpeed = 10
+fireballSpeed = 8
 playerSpeed = 5
 
-# Calculate enemy positions
+# Enemy starting positions
 def getNeighbours(i, n, arr):
     neighbours = []
     try:
@@ -58,7 +61,6 @@ def getNeighbours(i, n, arr):
     except:
         print() 
     return neighbours
-
 rows = 5
 cols = 10
 positions = [[0 for x in range(cols)] for x in range(rows)]
@@ -92,8 +94,6 @@ if(enemyLimit>0):
             unfilledPositions.remove(randomPos)
             num += 1
 
-# print(positions)
-# exit()
 
 class Enemy:
     def __init__(self,index,sprite=None, pos=None, speed=None):
@@ -113,8 +113,8 @@ class Enemy:
         self.pos = pygame.Vector2(x if x else position[1]*(64+enemyXGap)+startEnemyX, y if y else position[0]*(64+enemyXGap)+startEnemyY)
         if speed:
             customSpeed = True
-            xSpeed = speed.x*enemySpeedMultiplier
-            ySpeed = speed.y*enemySpeedMultiplier
+            xSpeed = speed.x*enemySpeed
+            ySpeed = speed.y*enemySpeed
         else:
             customSpeed = None
             xSpeed = None
@@ -123,20 +123,20 @@ class Enemy:
         if customSpeed:
             self.speed = pygame.Vector2([xSpeed, ySpeed]) 
         else:
-            speedModule = math.sqrt(pow(xSpeed if xSpeed else .2*enemySpeedMultiplier, 2)+pow(ySpeed if ySpeed  else .1*enemySpeedMultiplier,2))
+            speedModule = math.sqrt(pow(xSpeed if xSpeed else .2*enemySpeed, 2)+pow(ySpeed if ySpeed  else .1*enemySpeed,2))
             self.speed = pygame.Vector2([speedModule* math.cos(angle), speedModule * math.sin(angle)]) 
     def move(self,x,y):
         screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
         self.speed = pygame.Vector2((-self.speed.x, self.speed.y)) if ax == 'x' else pygame.Vector2((self.speed.x, -self.speed.y))
     def checkBorderCollision(self):
-        if self.pos.x + self.speed.x >= 736:
+        if self.pos.x + self.speed.x <= enemyCollisionXStart:
             return 'x'
-        if self.pos.x + self.speed.x <= 0:
+        if self.pos.x + self.speed.x >= enemyCollisionXEnd:
             return 'x'
-        if self.pos.y + self.speed.y >= 600:
+        if self.pos.y + self.speed.y <= enemyCollisionYStart:
             return 'y'
-        if self.pos.y + self.speed.y <= 0:
+        if self.pos.y + self.speed.y >= enemyCollisionYEnd:
             return 'y'
         return False
 
