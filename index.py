@@ -1,5 +1,5 @@
 from re import X
-from turtle import speed
+from turtle import position, showturtle, speed
 from numpy import empty
 import pygame
 import math
@@ -7,6 +7,8 @@ import random
 import click
 import pathlib
 import time
+
+from pyparsing import col
 
 # Initialize clock for dt and limiting the framerate
 clock = pygame.time.Clock()
@@ -156,6 +158,15 @@ class Fireball:
     def move(self,x,y):
         screen.blit(self.sprite, (x,y))
 
+class Ball: 
+    def __init__(self, pos, speed):
+        self.pos = pos
+        self.speed = speed
+        self.sprite = pygame.image.load("assets/ball.png")
+        self.state = 'ready'
+    def move(self,x,y):
+        screen.blit(self.sprite, (x,y))
+
 class Hearth:
     def __init__(self, index):
         self.index = index
@@ -185,6 +196,8 @@ fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0,
 hearts = []
 for i in range(0, heartCount):
     hearts.append(Hearth(i+1))
+ball = Ball(pygame.Vector2(0,0), pygame.Vector2(0, fireballSpeed))
+ball.move(-70,0)
 
 # Helpers
 def isCollision(obj1, obj2, distance):
@@ -195,6 +208,20 @@ def changeXPos(obj, x, dt):
     obj.pos.x += x
 def changeYPos(obj, y, dt):
     obj.pos.y += y
+def getEnemiesReadyToShoot(enemies, positions):
+    candidates = []
+    columns = [[] for x in range(10)]
+    for enemy in enemies:
+        for i, row in enumerate(positions):
+            if enemy.index in row:
+                columns[row.index(enemy.index)-1].append([row.index(enemy.index),i])
+    for column in columns:
+        if len(column) > 0:
+            column.sort(key = lambda x: x[1])
+            candidates.append(column[-1])
+    return candidates
+    
+
 
 # State 
 fireballState = 'ready'
@@ -250,6 +277,24 @@ while active:
         if(groupCollision):
                 enemy.changeDirectionSymmetrically('x')
         enemy.move(enemy.pos.x, enemy.pos.y)
+
+    enemiesReadyToShoot = getEnemiesReadyToShoot(enemies, positions)
+    print(enemiesReadyToShoot)
+    shootingEnemyPos = random.choice(enemiesReadyToShoot)
+    shootingEnemyIndex = positions[shootingEnemyPos[1]][shootingEnemyPos[0]]
+    shootingEnemy = None
+    for enemy in enemies:
+        if enemy.index == shootingEnemyIndex:
+            shootingEnemy = enemy
+
+    if(ball.state == 'ready'):
+        ball.pos.x = shootingEnemy.pos.x
+        ball.pos.y = shootingEnemy.pos.y
+        ball.move(ball.pos.x, ball.pos.y)
+        ball.state = 'fire'
+    elif ball.state == 'fire':
+        ball.move(ball.pos.x, ball.pos.y)
+        changeYPos(ball, fireballSpeed,dt)
 
     # Fireball logic
     colidedEnemies = []
