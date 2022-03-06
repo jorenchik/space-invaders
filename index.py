@@ -163,6 +163,10 @@ gameIcon = pygame.image.load("assets/icon.ico")
 screen = pygame.display.set_mode((800,800))
 screenImage = pygame.image.load("assets/screen.png")
 
+pygame.font.init() # you have to call this at the start, 
+                   # if you want to use this module.
+myfont = pygame.font.SysFont('Comic Sans MS', 30)
+
 
 # Create entities
 enemies = []
@@ -193,6 +197,10 @@ active = True
 prevTime = time.time()
 while active:
     screen.fill([53,69,172])
+
+    # Display score
+    textsurface = myfont.render(f"Score: {score}", False, (0, 0, 0))
+    screen.blit(textsurface,(20,20))
 
     # Calculates deltatime
     clock.tick(fpsLimit)
@@ -248,7 +256,6 @@ while active:
         fireball.pos.y = player.pos.y
         fireball.state = 'ready'
         score += 1
-        print(score)
     for enemy in colidedEnemies:
         enemies.remove(enemy)
             
