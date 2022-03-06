@@ -242,16 +242,20 @@ while active:
         enemy.move(enemy.pos.x, enemy.pos.y)
 
     # Fireball logic
+    colidedEnemies = []
+    for enemy in enemies:
+        if isCollision(fireball, enemy, 50):
+            colidedEnemies.append(enemy)
     if fireball.pos.y <= 0:
+        if len(colidedEnemies) == 0:
+            score -= 1
+            if score < 0:
+                score = 0 
         fireball.pos.y = player.pos.y
         fireball.state = 'ready'
     if fireball.state == 'fire':
         fireball.move(fireball.pos.x, fireball.pos.y)
         changeYPos(fireball, fireball.speed.y,dt)
-    colidedEnemies = []
-    for enemy in enemies:
-        if isCollision(fireball, enemy, 50):
-            colidedEnemies.append(enemy)
     if(len(colidedEnemies) > 0):
         fireball.pos.y = player.pos.y
         fireball.state = 'ready'
