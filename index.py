@@ -24,7 +24,7 @@ enemySprites = list(assets.glob("enemy_*.png"))
 # Settings
 fpsLimit = 60
 enemyLimit = 6
-heartCount = 2
+heartCount = 1
 startEnemyX = 30
 startEnemyY = 100
 endEnemyY = 450
@@ -182,12 +182,14 @@ gameIcon = pygame.image.load("assets/icon.ico")
 screen = pygame.display.set_mode((800,800))
 screenImage = pygame.image.load("assets/screen.png")
 
+SCREEN_WIDTH = pygame.display.get_window_size()[0]
+SCREEN_HEIGHT = pygame.display.get_window_size()[1]
+
 pygame.font.init() # you have to call this at the start, 
                    # if you want to use this module.
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
 
-# Create entities
 enemies = []
 for i in range(0,enemyLimit):
     enemies.append(Enemy(i+1))
@@ -220,7 +222,7 @@ def getEnemiesReadyToShoot(enemies, positions):
             column.sort(key = lambda x: x[1])
             candidates.append(column[-1])
     return candidates
-    
+
 
 
 # State 
@@ -228,12 +230,34 @@ fireballState = 'ready'
 score = 0
 leftTouched = False
 rightTouched = False
+playerAlive = True
 
 # Update cycle
 active = True
 prevTime = time.time()
+
+def waitForKey(text):
+    global active
+    waiting = True
+    while waiting:
+        clock.tick(fpsLimit)
+        gameOverText = myfont.render(text, False, (0, 0, 0))
+        textRect = gameOverText.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
+        screen.blit(gameOverText,textRect)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                active = False
+            # if event.type == pygame.KEYUP:
+            #     waiting = False
+        if not active:
+            break
+        pygame.display.update()
+
 while active:
     screen.fill([53,69,172])
+
+    if not playerAlive:
+        waitForKey("GAME OVER. PRESS ANY KEY TO RESTART")
 
     # Display score
     textsurface = myfont.render(f"Score: {score}", False, (0, 0, 0))
@@ -267,6 +291,14 @@ while active:
     if not playerBorderCollision:
         changeXPos(player, player.speed.x,dt)
     player.move(player.pos.x, player.pos.y)
+    collision = isCollision(player,ball,27)
+    if collision and ball.state != "ready":
+        if len(hearts) > 1:
+            hearts.remove(hearts[-1])
+        else:
+            playerAlive = False
+            
+        ball.state = "ready"
 
     # Enemy logic
     groupCollision = checkEnemyGroupCollision(enemies)
@@ -279,7 +311,6 @@ while active:
         enemy.move(enemy.pos.x, enemy.pos.y)
 
     enemiesReadyToShoot = getEnemiesReadyToShoot(enemies, positions)
-    print(enemiesReadyToShoot)
     shootingEnemyPos = random.choice(enemiesReadyToShoot)
     shootingEnemyIndex = positions[shootingEnemyPos[1]][shootingEnemyPos[0]]
     shootingEnemy = None
@@ -287,7 +318,7 @@ while active:
         if enemy.index == shootingEnemyIndex:
             shootingEnemy = enemy
 
-    if(ball.state == 'ready'):
+    if ball.state == 'ready':
         ball.pos.x = shootingEnemy.pos.x
         ball.pos.y = shootingEnemy.pos.y
         ball.move(ball.pos.x, ball.pos.y)
