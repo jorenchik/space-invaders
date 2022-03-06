@@ -21,10 +21,11 @@ enemySprites = list(assets.glob("enemy_*.png"))
 
 # Settings
 fpsLimit = 60
-enemyLimit = 2
+enemyLimit = 6
+heartCount = 2
 startEnemyX = 30
-startEnemyY = 50
-endEnemyY = 410
+startEnemyY = 100
+endEnemyY = 450
 enemyXGap = 5
 enemyYGap = 5
 enemyCollisionYStart = 0
@@ -155,6 +156,13 @@ class Fireball:
     def move(self,x,y):
         screen.blit(self.sprite, (x,y))
 
+class Hearth:
+    def __init__(self, index):
+        self.index = index
+        self.pos = pygame.Vector2(((index*(32+5)-16),45))
+        self.sprite = pygame.image.load('assets/heart.png')
+    def move(self,x,y):
+        screen.blit(self.sprite, (x,y))
 
 # Game initialization
 pygame.init()
@@ -174,7 +182,9 @@ for i in range(0,enemyLimit):
     enemies.append(Enemy(i+1))
 player = Player()
 fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0, -fireballSpeed))
-
+hearts = []
+for i in range(0, heartCount):
+    hearts.append(Hearth(i+1))
 
 # Helpers
 def isCollision(obj1, obj2, distance):
@@ -262,5 +272,8 @@ while active:
         score += 1
     for enemy in colidedEnemies:
         enemies.remove(enemy)
-            
+    
+    for heart in hearts:
+        heart.move(heart.pos.x, heart.pos.y)
+
     pygame.display.update()
