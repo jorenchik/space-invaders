@@ -97,7 +97,6 @@ if(enemyLimit>0):
             unfilledPositions.remove(randomPos)
             num += 1
 
-
 class Enemy:
     def __init__(self,index):
         self.index = index
@@ -123,16 +122,6 @@ class Enemy:
         if self.pos.y + self.speed.y >= enemyCollisionYEnd:
             return 'y'
         return False
-
-def checkEnemyGroupCollision(group):
-    enemiesCollided = []
-    for enemy in group:
-        collision = enemy.checkBorderCollision()
-        if collision:
-            enemiesCollided.append(enemy)
-    if len(enemiesCollided) > 0:
-        return True
-    return False
 
 class Player:
     pos = pygame.Vector2((370,580))
@@ -181,15 +170,12 @@ pygame.display.set_caption("Space invaders")
 gameIcon = pygame.image.load("assets/icon.ico")
 screen = pygame.display.set_mode((800,800))
 screenImage = pygame.image.load("assets/screen.png")
-
 SCREEN_WIDTH = pygame.display.get_window_size()[0]
 SCREEN_HEIGHT = pygame.display.get_window_size()[1]
-
-pygame.font.init() # you have to call this at the start, 
-                   # if you want to use this module.
+pygame.font.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
-
+# Create entities
 enemies = []
 for i in range(0,enemyLimit):
     enemies.append(Enemy(i+1))
@@ -222,7 +208,15 @@ def getEnemiesReadyToShoot(enemies, positions):
             column.sort(key = lambda x: x[1])
             candidates.append(column[-1])
     return candidates
-
+def checkEnemyGroupCollision(group):
+    enemiesCollided = []
+    for enemy in group:
+        collision = enemy.checkBorderCollision()
+        if collision:
+            enemiesCollided.append(enemy)
+    if len(enemiesCollided) > 0:
+        return True
+    return False
 
 
 # State 
@@ -231,11 +225,10 @@ score = 0
 leftTouched = False
 rightTouched = False
 playerAlive = True
+active = True
 
 # Update cycle
-active = True
 prevTime = time.time()
-
 def waitForKey(text):
     global active
     waiting = True
