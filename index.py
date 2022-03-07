@@ -317,22 +317,23 @@ while game.active:
                 enemy.changeDirectionSymmetrically('x')
         enemy.move(enemy.pos.x, enemy.pos.y)
 
-    enemiesReadyToShoot = getEnemiesReadyToShoot(enemies, positions)
-    shootingEnemyPos = random.choice(enemiesReadyToShoot)
-    shootingEnemyIndex = positions[shootingEnemyPos[1]][shootingEnemyPos[0]]
-    shootingEnemy = None
-    for enemy in enemies:
-        if enemy.index == shootingEnemyIndex:
-            shootingEnemy = enemy
+    if len(enemies) > 0:
+        enemiesReadyToShoot = getEnemiesReadyToShoot(enemies, positions)
+        shootingEnemyPos = random.choice(enemiesReadyToShoot)
+        shootingEnemyIndex = positions[shootingEnemyPos[1]][shootingEnemyPos[0]]
+        shootingEnemy = None
+        for enemy in enemies:
+            if enemy.index == shootingEnemyIndex:
+                shootingEnemy = enemy
 
-    if ball.state == 'ready':
-        ball.pos.x = shootingEnemy.pos.x
-        ball.pos.y = shootingEnemy.pos.y
-        ball.move(ball.pos.x, ball.pos.y)
-        ball.state = 'fire'
-    elif ball.state == 'fire':
-        ball.move(ball.pos.x, ball.pos.y)
-        changeYPos(ball, fireballSpeed,dt)
+        if ball.state == 'ready':
+            ball.pos.x = shootingEnemy.pos.x
+            ball.pos.y = shootingEnemy.pos.y
+            ball.move(ball.pos.x, ball.pos.y)
+            ball.state = 'fire'
+        elif ball.state == 'fire':
+            ball.move(ball.pos.x, ball.pos.y)
+            changeYPos(ball, fireballSpeed,dt)
 
     # Fireball logic
     colidedEnemies = []
@@ -352,7 +353,7 @@ while game.active:
     if(len(colidedEnemies) > 0):
         fireball.pos.y = player.pos.y
         fireball.state = 'ready'
-        score += 1
+        game.score += 1
     for enemy in colidedEnemies:
         enemies.remove(enemy)
     
