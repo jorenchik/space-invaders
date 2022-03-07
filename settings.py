@@ -1,0 +1,23 @@
+# Game settings
+title = "Space invaders"
+icon = "assets/icon.ico"
+resolution = (800,800)
+font_ = "Comic Sans MS"
+fpsLimit = 60
+enemyLimit = 6
+heartCount = 1
+startEnemyX = 30
+startEnemyY = 100
+endEnemyY = 450
+enemyXGap = 5
+enemyYGap = 5
+enemyCollisionYStart = 0
+enemyCollisionYEnd = 600
+enemyCollisionXStart = 0
+enemyCollisionXEnd = 736
+playerCollisionXStart = 0
+playerCollisionXEnd = 736
+enemySpeed = 2
+fireballSpeed = 8
+playerSpeed = 3
+hitboxesVisible = False
