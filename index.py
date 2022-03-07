@@ -16,6 +16,10 @@ clock = pygame.time.Clock()
 # Clear the console
 click.clear()
 
+
+# Colors
+RED = (255,0,0)
+
 # Enemy sprite load
 absPath = pathlib.Path.cwd()
 assets = pathlib.Path(absPath/'assets')
@@ -39,6 +43,7 @@ playerCollisionXEnd = 736
 enemySpeed = 2
 fireballSpeed = 8
 playerSpeed = 3
+hitboxesVisible = True
 
 # Enemy starting positions
 def getNeighbours(i, n, arr):
@@ -122,6 +127,10 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.active = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.waiting = False
+                        self.playerAlive = True
             if not self.active:
                 break
             pygame.display.update()
@@ -139,7 +148,9 @@ class Enemy:
             if self.index in row:
                 position = [i, row.index(self.index)]
         self.pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
-        self.speed = pygame.Vector2([1*enemySpeed, 0*enemySpeed]) 
+        self.speed = pygame.Vector2([1*enemySpeed, 0*enemySpeed])
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,64,64)
+        
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
@@ -154,6 +165,8 @@ class Enemy:
         if self.pos.y + self.speed.y >= enemyCollisionYEnd:
             return 'y'
         return False
+    def moveRect(self):
+        self.rect.center = (enemy.pos.x+32,enemy.pos.y+32)
 
 class Player:
     pos = pygame.Vector2((370,580))
@@ -240,37 +253,15 @@ def checkEnemyGroupCollision(group):
         return True
     return False
 
-
-# State 
-# fireballState = 'ready'
-# score = 0
-# leftTouched = False
-# rightTouched = False
-# playerAlive = True
-# active = True
-
 # Update cycle
 prevTime = time.time()
-def waitForKey(text):
-    global active
-    waiting = True
-    while waiting:
-        clock.tick(fpsLimit)
-        gameOverText = game.font.render(text, False, (0, 0, 0))
-        textRect = gameOverText.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
-        game.screen.blit(gameOverText,textRect)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                active = False
-        if not active:
-            break
-        pygame.display.update()
+
 
 while game.active:
     game.screen.fill([53,69,172])
 
     if not game.playerAlive:
-        game.waitForKey("GAME OVER. PRESS ANY KEY TO RESTART")
+        game.waitForKey("GAME OVER. PRESS SPACE TO RESTART")
 
     # Display score
     textsurface = game.font.render(f"Score: {game.score}", False, (0, 0, 0))
@@ -316,6 +307,9 @@ while game.active:
     # Enemy logic
     groupCollision = checkEnemyGroupCollision(enemies)
     for enemy in enemies:
+        enemy.moveRect()
+        if hitboxesVisible:
+            pygame.draw.rect(game.screen, RED, enemy.rect, 2)
         changeXPos(enemy, enemy.speed.x,dt)
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
@@ -347,9 +341,9 @@ while game.active:
             colidedEnemies.append(enemy)
     if fireball.pos.y <= 0:
         if len(colidedEnemies) == 0:
-            score -= 1
-            if score < 0:
-                score = 0 
+            game.score -= 1
+            if game.score < 0:
+                game.score = 0 
         fireball.pos.y = player.pos.y
         fireball.state = 'ready'
     if fireball.state == 'fire':
