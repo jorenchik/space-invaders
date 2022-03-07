@@ -44,6 +44,7 @@ if(enemyLimit>0):
             unfilledPositions.remove(randomPos)
             num += 1
 
+
 class Enemy:
     def __init__(self,index):
         self.index = index
@@ -63,32 +64,34 @@ class Enemy:
     def changeDirectionSymmetrically(self, ax):
         self.speed = pygame.Vector2((-self.speed.x, self.speed.y)) if ax == 'x' else pygame.Vector2((self.speed.x, -self.speed.y))
     def checkBorderCollision(self):
-        if self.pos.x + self.speed.x <= enemyCollisionXStart:
-            return 'x'
-        if self.pos.x + self.speed.x >= enemyCollisionXEnd:
-            return 'x'
-        if self.pos.y + self.speed.y <= enemyCollisionYStart:
-            return 'y'
-        if self.pos.y + self.speed.y >= enemyCollisionYEnd:
-            return 'y'
+        if self.rect.colliderect(game.leftBorder):
+            return 'left'
+        if self.rect.colliderect(game.rightBorder):
+            return 'right'
         return False
     def moveRect(self):
         self.rect.center = (self.pos.x+self.hitboxWidth/2,self.pos.y+self.hitboxHeight/2)
 
 class Player:
-    pos = pygame.Vector2((370,580))
-    speed = pygame.Vector2((0,0))
-    sprite = pygame.image.load("assets/player_sprite.png")
+    def __init__(self):
+        self.pos = pygame.Vector2((370,580))
+        self.speed = pygame.Vector2((0,0))
+        self.sprite = pygame.image.load("assets/player_sprite.png")
+        self.hitboxWidth = 64
+        self.hitboxHeight = 64
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))
     def changeSpeedX(self, x):
         self.speed.x = x
     def checkBorderCollision(self):
-        if self.pos.x + self.speed.x <= playerCollisionXStart:
-            return True
-        if self.pos.x + self.speed.x >= playerCollisionXEnd:
-            return True
+        if self.rect.colliderect(game.leftBorder):
+            return 'left'
+        if self.rect.colliderect(game.rightBorder):
+            return 'right'
         return False
+    def moveRect(self):
+        self.rect.center = (self.pos.x+self.hitboxWidth/2,self.pos.y+self.hitboxHeight/2)
         
 class Fireball: 
     def __init__(self, pos, speed):

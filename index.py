@@ -63,6 +63,10 @@ while game.active:
     playerBorderCollision = player.checkBorderCollision()
     if not playerBorderCollision:
         changeXPos(player, player.speed.x,dt)
+    elif playerBorderCollision =='right':
+        changeXPos(player,-5,dt)
+    else:
+        changeXPos(player,5,dt)
     player.move(player.pos.x, player.pos.y)
     collision = isCollision(player,ball,27)
     if collision and ball.state != "ready":
@@ -82,7 +86,9 @@ while game.active:
         changeXPos(enemy, enemy.speed.x,dt)
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
-        if(groupCollision):
+        if(groupCollision and enemy.speed.x>0 and groupCollision == 'right'):
+                enemy.changeDirectionSymmetrically('x')
+        if(groupCollision and enemy.speed.x<0 and groupCollision == 'left'):
                 enemy.changeDirectionSymmetrically('x')
         enemy.move(enemy.pos.x, enemy.pos.y)
 
@@ -103,6 +109,12 @@ while game.active:
         elif ball.state == 'fire':
             ball.move(ball.pos.x, ball.pos.y)
             changeYPos(ball, fireballSpeed,dt)
+
+    if hitboxesVisible:
+        pygame.draw.rect(game.screen, RED, game.leftBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.rightBorder, 2)
+        pygame.draw.rect(game.screen, RED, player.rect, 2)
+    player.moveRect()
 
     # Fireball logic
     colidedEnemies = []

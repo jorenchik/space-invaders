@@ -20,6 +20,8 @@ class Game:
         self.playerAlive = True
         self.active = True
         self.waiting = False
+        self.leftBorder = pygame.Rect(leftBorder,0,1,self.SCREEN_HEIGHT)
+        self.rightBorder = pygame.Rect(rightBorder,0,1,self.SCREEN_HEIGHT)
     def waitForKey(self, text):
         self.waiting = True
         while self.waiting:

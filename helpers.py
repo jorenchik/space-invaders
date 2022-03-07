@@ -24,9 +24,9 @@ def checkEnemyGroupCollision(group):
     for enemy in group:
         collision = enemy.checkBorderCollision()
         if collision:
-            enemiesCollided.append(enemy)
+            enemiesCollided.append([enemy, collision])
     if len(enemiesCollided) > 0:
-        return True
+        return enemiesCollided[0][1]
     return False
 def getNeighbours(i, n, arr):
     neighbours = []
