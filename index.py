@@ -97,6 +97,38 @@ if(enemyLimit>0):
             unfilledPositions.remove(randomPos)
             num += 1
 
+class Game:
+    def __init__(self, caption, icon, resolution, font):
+        pygame.init()
+        pygame.display.set_caption(caption)
+        self.gameIcon = pygame.image.load(icon)
+        self.screen = pygame.display.set_mode(resolution)
+        self.SCREEN_WIDTH = pygame.display.get_window_size()[0]
+        self.SCREEN_HEIGHT = pygame.display.get_window_size()[1]
+        pygame.font.init()
+        self.font = pygame.font.SysFont(font, 30)
+        self.fireballState = 'ready'
+        self.score = 0
+        self.playerAlive = True
+        self.active = True
+        self.waiting = False
+    def waitForKey(self, text):
+        self.waiting = True
+        while self.waiting:
+            clock.tick(fpsLimit)
+            gameOverText = game.font.render(text, False, (0, 0, 0))
+            textRect = gameOverText.get_rect(center=(self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2))
+            game.screen.blit(gameOverText,textRect)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.active = False
+            if not self.active:
+                break
+            pygame.display.update()
+
+# Game initialization
+game = Game("Space invaders", "assets/icon.ico", (800,800), "Comic Sans MS")
+
 class Enemy:
     def __init__(self,index):
         self.index = index
@@ -109,7 +141,7 @@ class Enemy:
         self.pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
         self.speed = pygame.Vector2([1*enemySpeed, 0*enemySpeed]) 
     def move(self,x,y):
-        screen.blit(self.sprite, (x,y))
+        game.screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
         self.speed = pygame.Vector2((-self.speed.x, self.speed.y)) if ax == 'x' else pygame.Vector2((self.speed.x, -self.speed.y))
     def checkBorderCollision(self):
@@ -128,7 +160,7 @@ class Player:
     speed = pygame.Vector2((0,0))
     sprite = pygame.image.load("assets/player_sprite.png")
     def move(self,x,y):
-        screen.blit(self.sprite, (x,y))
+        game.screen.blit(self.sprite, (x,y))
     def changeSpeedX(self, x):
         self.speed.x = x
     def checkBorderCollision(self):
@@ -145,7 +177,7 @@ class Fireball:
         self.sprite = pygame.image.load("assets/fireball_sprite.png")
         self.state = 'ready'
     def move(self,x,y):
-        screen.blit(self.sprite, (x,y))
+        game.screen.blit(self.sprite, (x,y))
 
 class Ball: 
     def __init__(self, pos, speed):
@@ -154,7 +186,7 @@ class Ball:
         self.sprite = pygame.image.load("assets/ball.png")
         self.state = 'ready'
     def move(self,x,y):
-        screen.blit(self.sprite, (x,y))
+        game.screen.blit(self.sprite, (x,y))
 
 class Hearth:
     def __init__(self, index):
@@ -162,18 +194,8 @@ class Hearth:
         self.pos = pygame.Vector2(((index*(32+5)-16),45))
         self.sprite = pygame.image.load('assets/heart.png')
     def move(self,x,y):
-        screen.blit(self.sprite, (x,y))
+        game.screen.blit(self.sprite, (x,y))
 
-# Game initialization
-pygame.init()
-pygame.display.set_caption("Space invaders")
-gameIcon = pygame.image.load("assets/icon.ico")
-screen = pygame.display.set_mode((800,800))
-screenImage = pygame.image.load("assets/screen.png")
-SCREEN_WIDTH = pygame.display.get_window_size()[0]
-SCREEN_HEIGHT = pygame.display.get_window_size()[1]
-pygame.font.init()
-myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
 # Create entities
 enemies = []
@@ -220,12 +242,12 @@ def checkEnemyGroupCollision(group):
 
 
 # State 
-fireballState = 'ready'
-score = 0
-leftTouched = False
-rightTouched = False
-playerAlive = True
-active = True
+# fireballState = 'ready'
+# score = 0
+# leftTouched = False
+# rightTouched = False
+# playerAlive = True
+# active = True
 
 # Update cycle
 prevTime = time.time()
@@ -234,27 +256,25 @@ def waitForKey(text):
     waiting = True
     while waiting:
         clock.tick(fpsLimit)
-        gameOverText = myfont.render(text, False, (0, 0, 0))
+        gameOverText = game.font.render(text, False, (0, 0, 0))
         textRect = gameOverText.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
-        screen.blit(gameOverText,textRect)
+        game.screen.blit(gameOverText,textRect)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 active = False
-            # if event.type == pygame.KEYUP:
-            #     waiting = False
         if not active:
             break
         pygame.display.update()
 
-while active:
-    screen.fill([53,69,172])
+while game.active:
+    game.screen.fill([53,69,172])
 
-    if not playerAlive:
-        waitForKey("GAME OVER. PRESS ANY KEY TO RESTART")
+    if not game.playerAlive:
+        game.waitForKey("GAME OVER. PRESS ANY KEY TO RESTART")
 
     # Display score
-    textsurface = myfont.render(f"Score: {score}", False, (0, 0, 0))
-    screen.blit(textsurface,(20,20))
+    textsurface = game.font.render(f"Score: {game.score}", False, (0, 0, 0))
+    game.screen.blit(textsurface,(20,20))
 
     # Calculates deltatime
     clock.tick(fpsLimit)
@@ -265,7 +285,7 @@ while active:
     # Player/event logic
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            active = False
+            game.active = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 player.changeSpeedX(-playerSpeed)
