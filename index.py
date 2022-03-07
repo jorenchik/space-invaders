@@ -149,8 +149,9 @@ class Enemy:
                 position = [i, row.index(self.index)]
         self.pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
         self.speed = pygame.Vector2([1*enemySpeed, 0*enemySpeed])
-        self.rect = pygame.Rect(self.pos.x,self.pos.y,64,64)
-        
+        self.hitboxWidth = 64
+        self.hitboxHeight = 64
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
@@ -166,7 +167,7 @@ class Enemy:
             return 'y'
         return False
     def moveRect(self):
-        self.rect.center = (enemy.pos.x+32,enemy.pos.y+32)
+        self.rect.center = (self.pos.x+self.hitboxWidth/2,self.pos.y+self.hitboxHeight/2)
 
 class Player:
     pos = pygame.Vector2((370,580))
@@ -189,9 +190,13 @@ class Fireball:
         self.speed = speed
         self.sprite = pygame.image.load("assets/fireball_sprite.png")
         self.state = 'ready'
+        self.hitboxWidth = 52
+        self.hitboxHeight = 52
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))
-
+    def moveRect(self):
+        self.rect.center = (self.pos.x+32,self.pos.y+32)
 class Ball: 
     def __init__(self, pos, speed):
         self.pos = pos
@@ -337,6 +342,9 @@ while game.active:
 
     # Fireball logic
     colidedEnemies = []
+    fireball.moveRect()
+    if hitboxesVisible and not fireball.state == 'ready':
+            pygame.draw.rect(game.screen, RED, fireball.rect, 2)
     for enemy in enemies:
         if isCollision(fireball, enemy, 50):
             colidedEnemies.append(enemy)
