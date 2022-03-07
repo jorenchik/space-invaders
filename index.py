@@ -309,7 +309,7 @@ while game.active:
         if len(hearts) > 1:
             hearts.remove(hearts[-1])
         else:
-            playerAlive = False
+            game.playerAlive = False
             
         ball.state = "ready"
 
