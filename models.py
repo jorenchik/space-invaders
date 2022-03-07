@@ -1,6 +1,8 @@
 import pygame
 import random
 import pathlib
+
+import scipy as sp
 from game import game
 from settings import *
 from helpers import *
@@ -44,21 +46,13 @@ if(enemyLimit>0):
             unfilledPositions.remove(randomPos)
             num += 1
 
-
-class Enemy:
-    def __init__(self,index):
+class Entity:
+    def __init__(self,index,sprite,speed):
         self.index = index
-        spriteIndex = random.randint(0, len(enemySprites)-1)
-        sprite = enemySprites[spriteIndex]
         self.sprite = pygame.image.load(sprite)
-        for i, row in enumerate(positions):
-            if self.index in row:
-                position = [i, row.index(self.index)]
-        self.pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
-        self.speed = pygame.Vector2([1*enemySpeed, 0*enemySpeed])
-        self.hitboxWidth = 64
-        self.hitboxHeight = 64
-        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
+        self.hitboxWidth = self.sprite.get_width()
+        self.hitboxHeight = self.sprite.get_height()
+        self.speed = speed
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
@@ -71,54 +65,52 @@ class Enemy:
         return False
     def moveRect(self):
         self.rect.center = (self.pos.x+self.hitboxWidth/2,self.pos.y+self.hitboxHeight/2)
-
-class Player:
-    def __init__(self):
-        self.pos = pygame.Vector2((370,580))
-        self.speed = pygame.Vector2((0,0))
-        self.sprite = pygame.image.load("assets/player_sprite.png")
-        self.hitboxWidth = 64
-        self.hitboxHeight = 64
-        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
-    def move(self,x,y):
-        game.screen.blit(self.sprite, (x,y))
     def changeSpeedX(self, x):
         self.speed.x = x
-    def checkBorderCollision(self):
-        if self.rect.colliderect(game.leftBorder):
-            return 'left'
-        if self.rect.colliderect(game.rightBorder):
-            return 'right'
-        return False
-    def moveRect(self):
-        self.rect.center = (self.pos.x+self.hitboxWidth/2,self.pos.y+self.hitboxHeight/2)
-        
-class Fireball: 
-    def __init__(self, pos, speed):
-        self.pos = pos
-        self.speed = speed
-        self.sprite = pygame.image.load("assets/fireball_sprite.png")
-        self.state = 'ready'
-        self.hitboxWidth = 52
-        self.hitboxHeight = 52
-        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
-    def move(self,x,y):
-        game.screen.blit(self.sprite, (x,y))
-    def moveRect(self):
-        self.rect.center = (self.pos.x+32,self.pos.y+32)
-class Ball: 
-    def __init__(self, pos, speed):
-        self.pos = pos
-        self.speed = speed
-        self.sprite = pygame.image.load("assets/ball.png")
-        self.state = 'ready'
-    def move(self,x,y):
-        game.screen.blit(self.sprite, (x,y))
+    def changeSpeedY(self, y):
+        self.speed.y = y
 
-class Hearth:
-    def __init__(self, index):
+class Enemy(Entity):
+    def __init__(self,index,sprite):
+        speed = pygame.Vector2((1*enemySpeed, 0*enemySpeed))
+        Entity.__init__(self,index,sprite,speed)
+        for i, row in enumerate(positions):
+            if self.index in row:
+                position = [i, row.index(self.index)]
+        self.pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
+        for i, row in enumerate(positions):
+            if self.index in row:
+                position = [i, row.index(self.index)]
+
+class Player(Entity):
+    def __init__(self,index,sprite):
+        speed = pygame.Vector2((0,0))
+        Entity.__init__(self,index,sprite,speed)
+        self.pos = pygame.Vector2((370,580))
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
+        
+class Fireball(Entity): 
+    def __init__(self,index,sprite,pos):
+        speed = pygame.Vector2((0,-fireballSpeed))
+        Entity.__init__(self,index,sprite,speed)
+        self.pos = pos
+        self.state = 'ready'
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
+
+class Ball(Entity): 
+    def __init__(self, index,sprite):
+        speed = pygame.Vector2(0, -fireballSpeed)
+        Entity.__init__(self,index,sprite,speed)
+        self.pos = pygame.Vector2((0,0))
+        self.speed = speed
+        self.state = 'ready'
+
+class Hearth(Entity):
+    def __init__(self, index,sprite):
         self.index = index
+        speed = pygame.Vector2((0,0))
+        Entity.__init__(self,index,sprite,speed)
         self.pos = pygame.Vector2(((index*(32+5)-16),45))
-        self.sprite = pygame.image.load('assets/heart.png')
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))

@@ -15,13 +15,15 @@ RED = (255,0,0)
 # Create entities
 enemies = []
 for i in range(0,enemyLimit):
-    enemies.append(Enemy(i+1))
-player = Player()
-fireball = Fireball(pygame.Vector2(player.pos.x,player.pos.y), pygame.Vector2(0, -fireballSpeed))
+    spriteIndex = random.randint(0, len(enemySprites)-1)
+    sprite = enemySprites[spriteIndex]
+    enemies.append(Enemy(i+1, sprite))
+player = Player(1, "assets/player_sprite.png")
+fireball = Fireball(1,"assets/fireball_sprite.png",pygame.Vector2(player.pos.x,player.pos.y))
 hearts = []
 for i in range(0, heartCount):
-    hearts.append(Hearth(i+1))
-ball = Ball(pygame.Vector2(0,0), pygame.Vector2(0, fireballSpeed))
+    hearts.append(Hearth(i+1,"assets/heart.png"))
+ball = Ball(1,"assets/ball.png")
 ball.move(-70,0)
 
 # Update cycle

@@ -18,4 +18,4 @@ rightBorder = 799
 enemySpeed = 2
 fireballSpeed = 8
 playerSpeed = 3
-hitboxesVisible = False
+hitboxesVisible = True
