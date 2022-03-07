@@ -1,6 +1,6 @@
 # Helper functions
-def isCollision(obj1, obj2, distance):
-    if obj1.pos.distance_to(obj2.pos) <= distance:
+def isCollision(rect1, rect2):
+    if rect1.colliderect(rect2):
         return True
     return False
 def changeXPos(obj, x, dt):

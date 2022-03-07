@@ -65,6 +65,9 @@ class Entity:
         return False
     def moveRect(self):
         self.rect.center = (self.pos.x+self.hitboxWidth/2,self.pos.y+self.hitboxHeight/2)
+    def changePos(self,x,y):
+        self.pos.x=x
+        self.pos.y=y
     def changeSpeedX(self, x):
         self.speed.x = x
     def changeSpeedY(self, y):
@@ -105,6 +108,7 @@ class Ball(Entity):
         self.pos = pygame.Vector2((0,0))
         self.speed = speed
         self.state = 'ready'
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
 
 class Hearth(Entity):
     def __init__(self, index,sprite):
@@ -112,5 +116,6 @@ class Hearth(Entity):
         speed = pygame.Vector2((0,0))
         Entity.__init__(self,index,sprite,speed)
         self.pos = pygame.Vector2(((index*(32+5)-16),45))
+        self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))

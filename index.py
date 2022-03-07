@@ -70,7 +70,7 @@ while game.active:
     else:
         changeXPos(player,5,dt)
     player.move(player.pos.x, player.pos.y)
-    collision = isCollision(player,ball,27)
+    collision = isCollision(player.rect,ball.rect)
     if collision and ball.state != "ready":
         if len(hearts) > 1:
             hearts.remove(hearts[-1])
@@ -94,6 +94,8 @@ while game.active:
                 enemy.changeDirectionSymmetrically('x')
         enemy.move(enemy.pos.x, enemy.pos.y)
 
+
+    # Ball logic
     if len(enemies) > 0:
         enemiesReadyToShoot = getEnemiesReadyToShoot(enemies, positions)
         shootingEnemyPos = random.choice(enemiesReadyToShoot)
@@ -102,21 +104,30 @@ while game.active:
         for enemy in enemies:
             if enemy.index == shootingEnemyIndex:
                 shootingEnemy = enemy
-
+        if isCollision(ball.rect, game.bottomBorder):
+            ball.state = 'ready'
+            ball.changeSpeedY(0)
+            ball.changePos(0,-1)
         if ball.state == 'ready':
             ball.pos.x = shootingEnemy.pos.x
             ball.pos.y = shootingEnemy.pos.y
             ball.move(ball.pos.x, ball.pos.y)
+            ball.changeSpeedY(-fireballSpeed)
             ball.state = 'fire'
         elif ball.state == 'fire':
             ball.move(ball.pos.x, ball.pos.y)
-            changeYPos(ball, fireballSpeed,dt)
+            changeYPos(ball, -ball.speed.y,dt)
 
+    # Draw independant hitboxes
     if hitboxesVisible:
         pygame.draw.rect(game.screen, RED, game.leftBorder, 2)
         pygame.draw.rect(game.screen, RED, game.rightBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.topBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.bottomBorder, 2)
         pygame.draw.rect(game.screen, RED, player.rect, 2)
+        pygame.draw.rect(game.screen, RED, ball.rect, 2)
     player.moveRect()
+    ball.moveRect()
 
     # Fireball logic
     colidedEnemies = []
@@ -124,7 +135,7 @@ while game.active:
     if hitboxesVisible and not fireball.state == 'ready':
             pygame.draw.rect(game.screen, RED, fireball.rect, 2)
     for enemy in enemies:
-        if isCollision(fireball, enemy, 50):
+        if isCollision(fireball.rect, enemy.rect):
             colidedEnemies.append(enemy)
     if fireball.pos.y <= 0:
         if len(colidedEnemies) == 0:
