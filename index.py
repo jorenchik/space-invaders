@@ -5,6 +5,7 @@ import time
 from models import *
 from game import *
 from helpers import *
+from sprites import *
 
 # Clear the console
 click.clear()
@@ -23,12 +24,12 @@ for index in range(0,enemyLimit):
     spriteIndex = random.randint(0, len(enemySprites)-1)
     sprite = enemySprites[spriteIndex]
     enemies.append(Enemy(index+1, sprite, pos))
-player = Player(1, "assets/player_sprite.png", pygame.Vector2((370,580)))
-fireball = Fireball(1,"assets/fireball_sprite.png",pygame.Vector2(player.pos.x,player.pos.y))
+player = Player(1, playerSprite, pygame.Vector2((370,580)))
+fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y))
 hearts = []
 for i in range(0, heartCount):
-    hearts.append(Heart(i+1,"assets/heart.png",pygame.Vector2(((i+1)*(32+5)-16),45)))
-ball = Ball(1,"assets/ball.png")
+    hearts.append(Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45)))
+ball = Ball(1,ballSprite)
 ball.move(-70,0)
 
 # Update cycle

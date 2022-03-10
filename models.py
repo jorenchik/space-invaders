@@ -1,17 +1,7 @@
-from turtle import position
 import pygame
-import random
-import pathlib
-
-import scipy as sp
 from game import game
 from settings import *
 from helpers import *
-
-# Enemy sprite load
-absPath = pathlib.Path.cwd()
-assets = pathlib.Path(absPath/'assets')
-enemySprites = list(assets.glob("enemy_*.png"))
 
 class Entity:
     def __init__(self,index,sprite,pos,speed):

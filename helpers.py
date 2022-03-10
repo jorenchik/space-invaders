@@ -1,6 +1,4 @@
-from calendar import c
 from settings import *
-import random
 
 # Helper functions
 def isCollision(rect1, rect2):
