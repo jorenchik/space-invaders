@@ -22,7 +22,7 @@ for index in range(0,enemyLimit):
             rowIndex = i
             position = [i, row.index(index+1)]
     pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
-    sprite = enemySprites[0]
+    sprite = enemySprites[rowIndex]
     enemies.append(Enemy(index+1, sprite, pos))
 player = Player(1, playerSprite, pygame.Vector2((370,580)))
 fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y))
