@@ -72,28 +72,33 @@ while game.active:
     if not playerBorderCollision:
         changeXPos(player, player.speed.x,dt)
     elif playerBorderCollision =='right':
-        changeXPos(player,-5, 1)
+        changeXPos(player,-1, 1)
     else:
         changeXPos(player,5,dt)
     player.move(player.pos.x, player.pos.y)
     collision = isCollision(player.rect,ball.rect)
     if collision and ball.state != "ready":
         if len(hearts) > 1:
-            hearts.remove(hearts[-1])
+            if not godMode:
+                hearts.remove(hearts[-1])
         else:
             game.playerAlive = False
-            
         ball.state = "ready"
 
     # Enemy logic
     groupCollision = checkEnemyGroupCollision(enemies)
+    enemyCount = len(enemies)
+    enemiesLost = enemyLimit-enemyCount
     for enemy in enemies:
+        enemy.changeSpeedMulitplier(.04*enemiesLost)
         enemy.moveRect()
         if hitboxesVisible:
             pygame.draw.rect(game.screen, RED, enemy.rect, 2)
         changeXPos(enemy, enemy.speed.x,dt)
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
+        if borderCollision:
+            print(borderCollision)
         if(groupCollision and enemy.speed.x>0 and groupCollision == 'right'):
             game.enemiesMovingDown = time.time()
             game.enemiesLastSideCollision = 'right'

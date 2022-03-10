@@ -1,3 +1,4 @@
+from audioop import mul
 import pygame
 from game import game
 from settings import *
@@ -35,12 +36,18 @@ class Entity:
         self.speed.y = y
 
 class Enemy(Entity):
+    initialSpeed = pygame.Vector2((1*enemySpeed, 0*enemySpeed))
     def __init__(self,index,sprite,pos):
-        speed = pygame.Vector2((1*enemySpeed, 0*enemySpeed))
+        speed = self.initialSpeed
         Entity.__init__(self,index,sprite,pos,speed)
+    def changeSpeedMulitplier(self, multiplier):
+        if(self.speed.x > 0):
+            self.speed = pygame.Vector2((self.initialSpeed.x + self.initialSpeed.x*(1+multiplier), 0))
+        if(self.speed.x < 0):
+            self.speed = pygame.Vector2((-self.initialSpeed.x - self.initialSpeed.x*(1+multiplier), 0))
+        if(self.speed.y < 0):
+            self.speed = pygame.Vector2((0, -self.initialSpeed.x - self.initialSpeed.x*(1+multiplier)))
     def checkBorderCollision(self):
-        if self.rect.colliderect(game.bottomEnemyBorder):
-            return 'bottom'
         if self.rect.colliderect(game.topEnemyBorder):
             return 'top'
         return super().checkBorderCollision()

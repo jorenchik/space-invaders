@@ -34,3 +34,4 @@ playerSpeed = .25
 
 # Hitboxes
 hitboxesVisible = True
+godMode = True
