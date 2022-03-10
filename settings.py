@@ -8,7 +8,7 @@ icon = "assets/icon.ico"
 font_ = "Comic Sans MS"
 
 # Gameplay
-enemyLimit = 40
+enemyLimit = 20
 heartCount = 5
 enemyKillScoreInc = 10
 missScoreDec = 10
@@ -32,4 +32,4 @@ fireballSpeed = .6
 playerSpeed = .25
 
 # Hitboxes
-hitboxesVisible = False
+hitboxesVisible = True

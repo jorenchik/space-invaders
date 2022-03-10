@@ -1,4 +1,3 @@
-from matplotlib import use
 from settings import *
 
 # Helper functions

@@ -130,6 +130,8 @@ while game.active:
         pygame.draw.rect(game.screen, RED, game.rightBorder, 2)
         pygame.draw.rect(game.screen, RED, game.topBorder, 2)
         pygame.draw.rect(game.screen, RED, game.bottomBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.bottomEnemyBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.topEnemyBorder, 2)
         pygame.draw.rect(game.screen, RED, player.rect, 2)
         pygame.draw.rect(game.screen, RED, ball.rect, 2)
     player.moveRect()

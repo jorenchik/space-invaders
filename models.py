@@ -36,6 +36,12 @@ class Enemy(Entity):
     def __init__(self,index,sprite,pos):
         speed = pygame.Vector2((1*enemySpeed, 0*enemySpeed))
         Entity.__init__(self,index,sprite,pos,speed)
+    def checkBorderCollision(self):
+        if self.rect.colliderect(game.bottomEnemyBorder):
+            return 'bottom'
+        if self.rect.colliderect(game.topEnemyBorder):
+            return 'top'
+        return super().checkBorderCollision()
 class Player(Entity):
     def __init__(self,index,sprite,pos):
         speed = pygame.Vector2((0,0))
