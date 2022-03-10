@@ -10,9 +10,6 @@ from sprites import *
 # Clear the console
 click.clear()
 
-# Colors
-RED = (255,0,0)
-
 # Create entities
 enemies = []
 positions = getEnemyPositions()
@@ -37,6 +34,7 @@ prevTime = time.time()
 while game.active:
     game.screen.fill([53,69,172])
 
+    # Game over if player isn't alive
     if not game.playerAlive:
         game.waitForKey("GAME OVER. PRESS SPACE TO RESTART")
 
@@ -68,6 +66,8 @@ while game.active:
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 player.changeSpeedX(0)
+
+    # Player border collision
     playerBorderCollision = player.checkBorderCollision()
     if not playerBorderCollision:
         changeXPos(player, player.speed.x,dt)
@@ -75,7 +75,11 @@ while game.active:
         changeXPos(player,-1, 1)
     else:
         changeXPos(player,5,dt)
+    
+    # Player movement
     player.move(player.pos.x, player.pos.y)
+
+    # Player death
     collision = isCollision(player.rect,ball.rect)
     if collision and ball.state != "ready":
         if len(hearts) > 1:
@@ -97,8 +101,6 @@ while game.active:
         changeXPos(enemy, enemy.speed.x,dt)
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
-        if borderCollision:
-            print(borderCollision)
         if(groupCollision and enemy.speed.x>0 and groupCollision == 'right'):
             game.enemiesMovingDown = time.time()
             game.enemiesLastSideCollision = 'right'
@@ -116,6 +118,20 @@ while game.active:
             if game.enemiesLastSideCollision == 'left':
                 enemy.rotateDirection(-90)
         game.enemiesMovingDown = False
+
+    # Draw hitboxes
+    if hitboxesVisible:
+        pygame.draw.rect(game.screen, RED, game.leftBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.rightBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.topBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.bottomBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.bottomEnemyBorder, 2)
+        pygame.draw.rect(game.screen, RED, game.topEnemyBorder, 2)
+        pygame.draw.rect(game.screen, RED, player.rect, 2)
+        pygame.draw.rect(game.screen, RED, ball.rect, 2)
+    player.moveRect()
+    ball.moveRect()
+    fireball.moveRect()
 
     # Ball logic
     if len(enemies) > 0:
@@ -140,22 +156,8 @@ while game.active:
             ball.move(ball.pos.x, ball.pos.y)
             changeYPos(ball, -ball.speed.y,dt)
 
-    # Draw independant hitboxes
-    if hitboxesVisible:
-        pygame.draw.rect(game.screen, RED, game.leftBorder, 2)
-        pygame.draw.rect(game.screen, RED, game.rightBorder, 2)
-        pygame.draw.rect(game.screen, RED, game.topBorder, 2)
-        pygame.draw.rect(game.screen, RED, game.bottomBorder, 2)
-        pygame.draw.rect(game.screen, RED, game.bottomEnemyBorder, 2)
-        pygame.draw.rect(game.screen, RED, game.topEnemyBorder, 2)
-        pygame.draw.rect(game.screen, RED, player.rect, 2)
-        pygame.draw.rect(game.screen, RED, ball.rect, 2)
-    player.moveRect()
-    ball.moveRect()
-
     # Fireball logic
     colidedEnemies = []
-    fireball.moveRect()
     if hitboxesVisible and not fireball.state == 'ready':
             pygame.draw.rect(game.screen, RED, fireball.rect, 2)
     for enemy in enemies:
