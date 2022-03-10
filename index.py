@@ -72,7 +72,7 @@ while game.active:
     if not playerBorderCollision:
         changeXPos(player, player.speed.x,dt)
     elif playerBorderCollision =='right':
-        changeXPos(player,-5,dt)
+        changeXPos(player,-5, 1)
     else:
         changeXPos(player,5,dt)
     player.move(player.pos.x, player.pos.y)
@@ -95,12 +95,10 @@ while game.active:
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
         if(groupCollision and enemy.speed.x>0 and groupCollision == 'right'):
-            changeXPos(enemy, -1, 0)
             game.enemiesMovingDown = time.time()
             game.enemiesLastSideCollision = 'right'
             enemy.rotateDirection(90)
         if(groupCollision and enemy.speed.x<0 and groupCollision == 'left'):
-            changeXPos(enemy, 1, 0)
             game.enemiesMovingDown = time.time()
             game.enemiesLastSideCollision = 'left'
             enemy.rotateDirection(-90)
@@ -108,7 +106,6 @@ while game.active:
 
     if game.enemiesMovingDown and (time.time() - game.enemiesMovingDown) > enemyMovingDownDur:
         for enemy in enemies:
-            print('here')
             if game.enemiesLastSideCollision == 'right':
                 enemy.rotateDirection(90)
             if game.enemiesLastSideCollision == 'left':
