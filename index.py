@@ -145,7 +145,7 @@ while game.active:
             colidedEnemies.append(enemy)
     if fireball.pos.y <= 0:
         if len(colidedEnemies) == 0:
-            game.score -= 1
+            game.score -= missScoreDec
             if game.score < 0:
                 game.score = 0 
         fireball.pos.y = player.pos.y
@@ -156,7 +156,7 @@ while game.active:
     if(len(colidedEnemies) > 0):
         fireball.pos.y = player.pos.y
         fireball.state = 'ready'
-        game.score += 1
+        game.score += len(colidedEnemies) * enemyKillScoreInc
     for enemy in colidedEnemies:
         enemies.remove(enemy)
     

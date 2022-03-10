@@ -10,6 +10,8 @@ font_ = "Comic Sans MS"
 # Gameplay
 enemyLimit = 40
 heartCount = 5
+enemyKillScoreInc = 10
+missScoreDec = 10
 
 # Sprites' positioning
 startEnemyX = 30
