@@ -25,6 +25,8 @@ class Game:
         self.bottomBorder = pygame.Rect(0,bottomBorder,self.SCREEN_WIDTH,1)
         self.bottomEnemyBorder = pygame.Rect(0,startEnemyY-1,self.SCREEN_WIDTH,1)
         self.topEnemyBorder = pygame.Rect(0,endEnemyY+1,self.SCREEN_WIDTH,1)
+        self.enemiesMovingDown = False
+        self.enemiesLastSideCollision = False
     def waitForKey(self, text):
         self.waiting = True
         while self.waiting:

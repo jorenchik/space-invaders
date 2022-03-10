@@ -95,11 +95,25 @@ while game.active:
         changeYPos(enemy, enemy.speed.y,dt)
         borderCollision = enemy.checkBorderCollision()
         if(groupCollision and enemy.speed.x>0 and groupCollision == 'right'):
-                enemy.changeDirectionSymmetrically('x')
+            changeXPos(enemy, -1, 0)
+            game.enemiesMovingDown = time.time()
+            game.enemiesLastSideCollision = 'right'
+            enemy.rotateDirection(90)
         if(groupCollision and enemy.speed.x<0 and groupCollision == 'left'):
-                enemy.changeDirectionSymmetrically('x')
+            changeXPos(enemy, 1, 0)
+            game.enemiesMovingDown = time.time()
+            game.enemiesLastSideCollision = 'left'
+            enemy.rotateDirection(-90)
         enemy.move(enemy.pos.x, enemy.pos.y)
 
+    if game.enemiesMovingDown and (time.time() - game.enemiesMovingDown) > enemyMovingDownDur:
+        for enemy in enemies:
+            print('here')
+            if game.enemiesLastSideCollision == 'right':
+                enemy.rotateDirection(90)
+            if game.enemiesLastSideCollision == 'left':
+                enemy.rotateDirection(-90)
+        game.enemiesMovingDown = False
 
     # Ball logic
     if len(enemies) > 0:

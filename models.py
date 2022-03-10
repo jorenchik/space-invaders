@@ -16,6 +16,8 @@ class Entity:
         game.screen.blit(self.sprite, (x,y))
     def changeDirectionSymmetrically(self, ax):
         self.speed = pygame.Vector2((-self.speed.x, self.speed.y)) if ax == 'x' else pygame.Vector2((self.speed.x, -self.speed.y))
+    def rotateDirection(self, deg):
+        self.speed = self.speed.rotate(deg)
     def checkBorderCollision(self):
         if self.rect.colliderect(game.leftBorder):
             return 'left'

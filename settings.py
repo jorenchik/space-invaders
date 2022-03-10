@@ -12,6 +12,7 @@ enemyLimit = 20
 heartCount = 5
 enemyKillScoreInc = 10
 missScoreDec = 10
+enemyMovingDownDur = .1
 
 # Sprites' positioning
 startEnemyX = 30
@@ -27,7 +28,7 @@ topBorder = 0
 bottomBorder = 799
 
 # Speed initial multipliers
-enemySpeed = .1
+enemySpeed = .06
 fireballSpeed = .6
 playerSpeed = .25
 
