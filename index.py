@@ -19,10 +19,10 @@ positions = getEnemyPositions()
 for index in range(0,enemyLimit):
     for i, row in enumerate(positions):
         if index+1 in row:
+            rowIndex = i
             position = [i, row.index(index+1)]
     pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
-    spriteIndex = random.randint(0, len(enemySprites)-1)
-    sprite = enemySprites[spriteIndex]
+    sprite = enemySprites[0]
     enemies.append(Enemy(index+1, sprite, pos))
 player = Player(1, playerSprite, pygame.Vector2((370,580)))
 fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y))

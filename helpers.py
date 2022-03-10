@@ -1,3 +1,4 @@
+from matplotlib import use
 from settings import *
 
 # Helper functions
@@ -34,17 +35,18 @@ def getEnemyPositions():
     rows = 5
     cols = 10
     positions = [[0 for x in range(cols)] for x in range(rows)]
-    usedRows = int(enemyLimit / 10) + 1
+    usedRows = int((enemyLimit-1) / 10) + 1
     currentRowIndex = 0
     enemyIndex = 1
     while currentRowIndex <= usedRows:
         row = positions[currentRowIndex]
         remainingEnemies = enemyLimit - currentRowIndex * 10
         if remainingEnemies >= 10: remainingEnemies = 10
-        for i in range(0, remainingEnemies):
-            del row[i]
-            row.insert(i, enemyIndex)
-            enemyIndex += 1
-            i += 1
+        if remainingEnemies:
+            for i in range(0, remainingEnemies):
+                del row[i]
+                row.insert(i, enemyIndex)
+                enemyIndex += 1
+                i += 1
         currentRowIndex += 1
     return positions

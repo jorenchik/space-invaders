@@ -8,7 +8,7 @@ icon = "assets/icon.ico"
 font_ = "Comic Sans MS"
 
 # Gameplay
-enemyLimit = 12
+enemyLimit = 40
 heartCount = 5
 
 # Sprites' positioning
