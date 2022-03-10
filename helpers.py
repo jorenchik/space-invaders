@@ -7,9 +7,9 @@ def isCollision(rect1, rect2):
         return True
     return False
 def changeXPos(obj, x, dt):
-    obj.pos.x += x
+    obj.pos.x += x*dt
 def changeYPos(obj, y, dt):
-    obj.pos.y += y
+    obj.pos.y += y*dt
 def getEnemiesReadyToShoot(enemies, positions):
     candidates = []
     columns = [[] for x in range(10)]

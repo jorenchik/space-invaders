@@ -26,10 +26,10 @@ rightBorder = 799
 topBorder = 0
 bottomBorder = 799
 
-# Speed multipliers
-enemySpeed = 2
-fireballSpeed = 8
-playerSpeed = 3
+# Speed initial multipliers
+enemySpeed = .1
+fireballSpeed = .6
+playerSpeed = .25
 
 # Hitboxes
 hitboxesVisible = False
