@@ -16,3 +16,5 @@ ballSprite = pl.Path(assets/"ball.png")
 
 # Hearth (indicator of lifes remaining)
 heartSprite = pl.Path(assets/"heart.png")
+
+bg = pl.Path(assets/"background.jpg")

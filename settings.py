@@ -5,7 +5,7 @@ fpsLimit = 60
 resolution = (800,800)
 title = "Space invaders"
 icon = "assets/icon.ico"
-font_ = "Comic Sans MS"
+font_ = "Arial"
 
 # Gameplay
 enemyLimit = 48

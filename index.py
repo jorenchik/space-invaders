@@ -24,18 +24,19 @@ def main():
     fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y), (32,32))
     hearts = []
     for i in range(0, heartCount):
-        heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45), (32,32))
+        heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),55), (32,32))
         hearts.append(heart)
     ball = Ball(1,ballSprite,pygame.Vector2((0,0)),(24,24))
     ball.move(-70,0)
+    background = pygame.transform.scale(pygame.image.load(bg), (800,800))
 
     # Update cycle
     prevTime = time.time()
     while game.active:
-        game.screen.fill([53,69,172])
+        game.screen.blit(background, (0,0))
 
         # Display score
-        textsurface = game.font.render(f"Score: {game.score}", False, (0, 0, 0))
+        textsurface = game.font.render(f"Score: {game.score}", False, (255, 255, 255))
         game.screen.blit(textsurface,(20,20))
 
         # Calculates deltatime
@@ -186,7 +187,7 @@ def gameOver():
     waiting = True
     while waiting:
         game.screen.fill([53,69,172])
-        gameOverText = game.font.render("Game over. Press space to restart.", False, (0, 0, 0))
+        gameOverText = game.font.render("Game over. Press space to restart.", False, (255, 255, 255))
         textRect = gameOverText.get_rect(center=(game.SCREEN_WIDTH/2, game.SCREEN_HEIGHT/2))
         game.screen.blit(gameOverText,textRect)
         for event in pygame.event.get():
