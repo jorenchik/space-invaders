@@ -1,3 +1,4 @@
+from html import entities
 import pygame
 import random
 import click
@@ -20,12 +21,14 @@ for index in range(0,enemyLimit):
             position = [i, row.index(index+1)]
     pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
     sprite = enemySprites[rowIndex]
-    enemies.append(Enemy(index+1, sprite, pos))
+    enemy = Enemy(index+1, sprite, pos)
+    enemies.append(enemy)
 player = Player(1, playerSprite, pygame.Vector2((370,580)))
 fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y))
 hearts = []
 for i in range(0, heartCount):
-    hearts.append(Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45)))
+    heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45))
+    hearts.append(heart)
 ball = Ball(1,ballSprite)
 ball.move(-70,0)
 
@@ -37,6 +40,11 @@ while game.active:
     # Game over if player isn't alive
     if not game.playerAlive:
         game.waitForKey("GAME OVER. PRESS SPACE TO RESTART")
+        game.reset()
+        hearts = []
+        for i in range(0, heartCount):
+            heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45))
+            hearts.append(heart)
 
     # Display score
     textsurface = game.font.render(f"Score: {game.score}", False, (0, 0, 0))
@@ -84,10 +92,13 @@ while game.active:
     if collision and ball.state != "ready":
         if len(hearts) > 1:
             if not godMode:
-                hearts.remove(hearts[-1])
+                player.ballHit()
+                if player.timesHit % 2 == 0:
+                    hearts.remove(hearts[-1])
         else:
             game.playerAlive = False
         ball.state = "ready"
+        ball.move(0,-70)
 
     # Enemy logic
     groupCollision = checkEnemyGroupCollision(enemies)
@@ -110,7 +121,6 @@ while game.active:
             game.enemiesLastSideCollision = 'left'
             enemy.rotateDirection(-90)
         enemy.move(enemy.pos.x, enemy.pos.y)
-
     if game.enemiesMovingDown and (time.time() - game.enemiesMovingDown) > enemyMovingDownDur:
         for enemy in enemies:
             if game.enemiesLastSideCollision == 'right':

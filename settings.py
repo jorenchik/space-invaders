@@ -34,7 +34,7 @@ playerSpeed = .25
 
 # Hitboxes
 hitboxesVisible = True
-godMode = True
+godMode = False
 
 # Colors
 RED = (255,0,0)

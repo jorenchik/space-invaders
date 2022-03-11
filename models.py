@@ -54,7 +54,10 @@ class Enemy(Entity):
 class Player(Entity):
     def __init__(self,index,sprite,pos):
         speed = pygame.Vector2((0,0))
+        self.timesHit = 0
         Entity.__init__(self,index,sprite,pos,speed)
+    def ballHit(self):
+        self.timesHit += 1
         
 class Fireball(Entity): 
     def __init__(self,index,sprite,pos):
