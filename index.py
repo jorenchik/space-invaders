@@ -100,6 +100,14 @@ def main():
         enemyCount = len(enemies)
         enemiesLost = enemyLimit-enemyCount
         for enemy in enemies:
+            collision = isCollision(player.rect, enemy.rect)
+            if collision:
+                game.playerAlive = False
+                game.active = False
+            collision = isCollision(game.bottomBorder, enemy.rect)
+            if collision:
+                game.playerAlive = False
+                game.active = False
             enemy.changeSpeedMulitplier(.04*enemiesLost)
             enemy.moveRect()
             if hitboxesVisible:
@@ -200,6 +208,7 @@ def gameOver():
                 exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
+                    game.score = 0
                     game.playerAlive = True
                     game.active = True
                     waiting = False
