@@ -6,6 +6,7 @@ resolution = (800,800)
 title = "Space invaders"
 icon = "assets/icon.ico"
 font_ = "Arial"
+fontSize = 25
 
 # Gameplay
 enemyLimit = 48

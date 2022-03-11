@@ -8,7 +8,7 @@ class Game:
     def __init__(self, caption, icon, resolution, font):
         pygame.init()
         pygame.display.set_caption(caption)
-        self.font = pygame.font.SysFont(font, 30)
+        self.font = pygame.font.SysFont(font, fontSize)
         pygame.font.init()
         self.gameIcon = pygame.image.load(icon)
         self.screen = pygame.display.set_mode(resolution)

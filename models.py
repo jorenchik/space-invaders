@@ -10,6 +10,7 @@ class Entity:
         self.sprite = pygame.transform.scale(spritePicture, size)
         self.hitboxWidth = self.sprite.get_width()
         self.hitboxHeight = self.sprite.get_height()
+        self.mask = pygame.mask.from_surface(self.sprite)
         self.speed = speed
         self.pos = pos
         self.rect = pygame.Rect(self.pos.x,self.pos.y,self.hitboxWidth,self.hitboxWidth)
@@ -34,6 +35,13 @@ class Entity:
         self.speed.x = x
     def changeSpeedY(self, y):
         self.speed.y = y
+    def maskOutline(self):
+        maskOutline = self.mask.outline()
+        n = 0
+        for point in maskOutline:
+            maskOutline[n] = (point[0] + self.pos[0], point[1] + self.pos[1])
+            n += 1
+        pygame.draw.polygon(game.screen, (255,255,255), maskOutline, 3)
 
 class Enemy(Entity):
     initialSpeed = pygame.Vector2((1*enemySpeed, 0*enemySpeed))
@@ -51,6 +59,10 @@ class Enemy(Entity):
         if self.rect.colliderect(game.topEnemyBorder):
             return 'top'
         return super().checkBorderCollision()
+    def move(self, x, y):
+        self.maskOutline()
+        return super().move(x, y)
+    
 class Player(Entity):
     def __init__(self,index,sprite,pos,size):
         speed = pygame.Vector2((0,0))
@@ -58,6 +70,9 @@ class Player(Entity):
         Entity.__init__(self,index,sprite,pos,speed,size)
     def ballHit(self):
         self.timesHit += 1
+    def move(self, x, y):
+        self.maskOutline()
+        return super().move(x, y)
         
 class Fireball(Entity): 
     def __init__(self,index,sprite,pos,size):
@@ -78,3 +93,6 @@ class Heart(Entity):
         Entity.__init__(self,index,sprite,pos,speed,size)
     def move(self,x,y):
         game.screen.blit(self.sprite, (x,y))
+    def move(self, x, y):
+        self.maskOutline()
+        return super().move(x, y)
