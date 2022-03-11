@@ -23,7 +23,6 @@ def main():
         enemies.append(enemy)
     player = Player(1, playerSprite, pygame.Vector2((370,720)),(50,50))
     fireballs = []
-    # fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y), (32,32))
     hearts = []
     for i in range(0, heartCount):
         heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),55), (32,32))
@@ -96,6 +95,9 @@ def main():
             heart.move(heart.pos.x, heart.pos.y)    
         
         # Enemy logic
+        if len(enemies) == 0:
+            game.playerAlive = False
+            game.active = False
         groupCollision = checkEnemyGroupCollision(enemies)
         enemyCount = len(enemies)
         enemiesLost = enemyLimit-enemyCount

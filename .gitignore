@@ -1,2 +1,5 @@
 TODO.txt
 /__pycache__
+index.spec
+/dist
+/build
