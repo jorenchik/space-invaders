@@ -29,6 +29,12 @@ class Game:
         self.waiting = False
         self.enemiesMovingDown = False
         self.enemiesLastSideCollision = False
+        # Sprites
+        self.enemies = []
+        self.player = False
+        self.ball = False
+        self.hearts = []
+        self.fireball = []
     def waitForKey(self, text):
         self.waiting = True
         while self.waiting:
