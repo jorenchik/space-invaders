@@ -9,7 +9,7 @@ font_ = "Comic Sans MS"
 
 # Gameplay
 enemyLimit = 20
-heartCount = 3
+heartCount = 1
 enemyKillScoreInc = 10
 missScoreDec = 10
 enemyMovingDownDur = .1

@@ -35,23 +35,6 @@ class Game:
         self.ball = False
         self.hearts = []
         self.fireball = []
-    def waitForKey(self, text):
-        self.waiting = True
-        while self.waiting:
-            clock.tick(fpsLimit)
-            gameOverText = game.font.render(text, False, (0, 0, 0))
-            textRect = gameOverText.get_rect(center=(self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2))
-            game.screen.blit(gameOverText,textRect)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.active = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        self.waiting = False
-                        self.playerAlive = True
-            if not self.active:
-                break
-            pygame.display.update()
     def reset(self):
         print()
             

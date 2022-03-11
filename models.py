@@ -7,7 +7,7 @@ class Entity:
     def __init__(self,index,sprite,pos,speed,size):
         self.index = index
         spritePicture = pygame.image.load(sprite)
-        self.sprite = pygame.transform.scale(spritePicture, (32,32))
+        self.sprite = pygame.transform.scale(spritePicture, size)
         self.hitboxWidth = self.sprite.get_width()
         self.hitboxHeight = self.sprite.get_height()
         self.speed = speed
