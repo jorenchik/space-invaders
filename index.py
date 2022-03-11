@@ -69,6 +69,8 @@ def main():
             changeXPos(player, player.speed.x,dt)
         elif playerBorderCollision =='right':
             changeXPos(player,-1, 1)
+        elif playerBorderCollision =='left':
+            changeXPos(player,1, 1)
         else:
             changeXPos(player,5,dt)
 
