@@ -1,15 +1,10 @@
-from html import entities
 import pygame
 import random
-import click
 import time
 from models import *
 from game import *
 from helpers import *
 from sprites import *
-
-# Clear the console
-click.clear()
 
 # Create entities
 enemies = []
@@ -21,15 +16,15 @@ for index in range(0,enemyLimit):
             position = [i, row.index(index+1)]
     pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
     sprite = enemySprites[rowIndex]
-    enemy = Enemy(index+1, sprite, pos)
+    enemy = Enemy(index+1, sprite, pos, (32,32))
     enemies.append(enemy)
-player = Player(1, playerSprite, pygame.Vector2((370,580)))
-fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y))
+player = Player(1, playerSprite, pygame.Vector2((370,580)),(48,48))
+fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y), (10,10))
 hearts = []
 for i in range(0, heartCount):
-    heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45))
+    heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45), (48,48))
     hearts.append(heart)
-ball = Ball(1,ballSprite)
+ball = Ball(1,ballSprite,pygame.Vector2((0,0)),(10,10))
 ball.move(-70,0)
 
 # Update cycle

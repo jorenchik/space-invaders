@@ -33,7 +33,7 @@ fireballSpeed = .6
 playerSpeed = .25
 
 # Hitboxes
-hitboxesVisible = True
+hitboxesVisible = False
 godMode = False
 
 # Colors
