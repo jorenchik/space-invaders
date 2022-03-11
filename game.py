@@ -29,6 +29,7 @@ class Game:
         self.waiting = False
         self.enemiesMovingDown = False
         self.enemiesLastSideCollision = False
+        self.fireballPrevShotTime = False
         # Sprites
         self.enemies = []
         self.player = False

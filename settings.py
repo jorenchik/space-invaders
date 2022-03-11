@@ -14,6 +14,7 @@ heartCount = 5
 enemyKillScoreInc = 10
 missScoreDec = 10
 enemyMovingDownDur = .03
+fireballCooldown = .3
 
 # Sprites' positioning
 startEnemyX = 30

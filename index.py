@@ -1,3 +1,4 @@
+from xml.dom.expatbuilder import FilterVisibilityController
 import pygame
 import random
 import time
@@ -21,7 +22,8 @@ def main():
         enemy = Enemy(index+1, sprite, pos, size)
         enemies.append(enemy)
     player = Player(1, playerSprite, pygame.Vector2((370,720)),(50,50))
-    fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y), (32,32))
+    fireballs = []
+    # fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y), (32,32))
     hearts = []
     for i in range(0, heartCount):
         heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),55), (32,32))
@@ -55,15 +57,16 @@ def main():
                 if event.key == pygame.K_RIGHT:
                     player.changeSpeedX(playerSpeed)
                 if event.key == pygame.K_SPACE:
-                    if fireball.state == "ready":
-                        # fireballX has a slight offset
-                        fireball.state = 'fire'
+                    if not game.fireballPrevShotTime or (time.time() - game.fireballPrevShotTime) >= fireballCooldown:
+                        fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y), (32,32))
+                        fireballs.append(fireball)
                         fireball.pos.x = (player.pos.x)
                         fireball.move(fireball.pos.x,fireball.pos.y)
+                        game.fireballPrevShotTime = time.time()
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     player.changeSpeedX(0)
-
+        
         playerBorderCollision = player.checkBorderCollision()
         if not playerBorderCollision:
             changeXPos(player, player.speed.x,dt)
@@ -133,8 +136,7 @@ def main():
             pygame.draw.rect(game.screen, RED, ball.rect, 2)
         player.moveRect()
         ball.moveRect()
-        fireball.moveRect()
-
+        
         # Ball logic
         if len(enemies) > 0:
             enemiesReadyToShoot = getEnemiesReadyToShoot(enemies, positions)
@@ -159,28 +161,29 @@ def main():
                 changeYPos(ball, -ball.speed.y,dt)
 
         # Fireball logic
-        colidedEnemies = []
-        if hitboxesVisible and not fireball.state == 'ready':
+        for fireball in fireballs:
+            fireball.moveRect()
+            colidedEnemies = []
+            if hitboxesVisible:
                 pygame.draw.rect(game.screen, RED, fireball.rect, 2)
-        for enemy in enemies:
-            if isCollision(fireball.rect, enemy.rect):
-                colidedEnemies.append(enemy)
-        if fireball.pos.y <= 0:
-            if len(colidedEnemies) == 0:
-                game.score -= missScoreDec
-                if game.score < 0:
-                    game.score = 0 
-            fireball.pos.y = player.pos.y
-            fireball.state = 'ready'
-        if fireball.state == 'fire':
+            for enemy in enemies:
+                if isCollision(fireball.rect, enemy.rect):
+                    colidedEnemies.append(enemy)
+            if fireball.pos.y <= 0:
+                if len(colidedEnemies) == 0:
+                    game.score -= missScoreDec
+                    if game.score < 0:
+                        game.score = 0 
+                fireball.pos.y = player.pos.y
+                fireballs.remove(fireball)
             fireball.move(fireball.pos.x, fireball.pos.y)
             changeYPos(fireball, fireball.speed.y,dt)
-        if(len(colidedEnemies) > 0):
-            fireball.pos.y = player.pos.y
-            fireball.state = 'ready'
-            game.score += len(colidedEnemies) * enemyKillScoreInc
-        for enemy in colidedEnemies:
-            enemies.remove(enemy)
+            if(len(colidedEnemies) > 0):
+                fireball.pos.y = player.pos.y
+                game.score += len(colidedEnemies) * enemyKillScoreInc
+                fireballs.remove(fireball)
+            for enemy in colidedEnemies:
+                enemies.remove(enemy)
 
         pygame.display.update()
 
