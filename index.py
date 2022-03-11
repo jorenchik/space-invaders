@@ -199,7 +199,8 @@ def gameOver():
      # Game over if player isn't alive
     waiting = True
     while waiting:
-        game.screen.fill([53,69,172])
+        background = pygame.transform.scale(pygame.image.load(bg), (800,800))
+        game.screen.blit(background, (0,0))
         gameOverText = game.font.render("Game over. Press space to restart.", False, (255, 255, 255))
         textRect = gameOverText.get_rect(center=(game.SCREEN_WIDTH/2, game.SCREEN_HEIGHT/2))
         game.screen.blit(gameOverText,textRect)
