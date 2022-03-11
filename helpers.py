@@ -11,7 +11,7 @@ def changeYPos(obj, y, dt):
     obj.pos.y += y*dt
 def getEnemiesReadyToShoot(enemies, positions):
     candidates = []
-    columns = [[] for x in range(10)]
+    columns = [[] for x in range(enemyColumns)]
     for enemy in enemies:
         for i, row in enumerate(positions):
             if enemy.index in row:
@@ -31,16 +31,15 @@ def checkEnemyGroupCollision(group):
         return enemiesCollided[0][1]
     return False
 def getEnemyPositions():
-    rows = 5
-    cols = 10
-    positions = [[0 for x in range(cols)] for x in range(rows)]
-    usedRows = int((enemyLimit-1) / 10) + 1
+    cols = enemyColumns
+    positions = [[0 for x in range(cols)] for x in range(maximalEnemyRows)]
+    usedRows = int((enemyLimit-1) / enemyColumns) + 1
     currentRowIndex = 0
     enemyIndex = 1
     while currentRowIndex <= usedRows:
         row = positions[currentRowIndex]
-        remainingEnemies = enemyLimit - currentRowIndex * 10
-        if remainingEnemies >= 10: remainingEnemies = 10
+        remainingEnemies = enemyLimit - currentRowIndex * enemyColumns
+        if remainingEnemies >= enemyColumns: remainingEnemies = enemyColumns
         if remainingEnemies:
             for i in range(0, remainingEnemies):
                 del row[i]

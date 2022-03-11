@@ -15,15 +15,16 @@ def main():
             if index+1 in row:
                 rowIndex = i
                 position = [i, row.index(index+1)]
-        pos = pygame.Vector2(position[1]*(64+enemyXGap)+startEnemyX,position[0]*(64+enemyXGap)+startEnemyY)
-        sprite = enemySprites[rowIndex]
-        enemy = Enemy(index+1, sprite, pos, (32,32))
+        size = (32,32)
+        pos = pygame.Vector2(position[1]*(size[0]+enemyXGap)+startEnemyX,position[0]*(size[1]+enemyXGap)+startEnemyY)
+        sprite = enemySprites[((rowIndex+1) % 4) - 1]
+        enemy = Enemy(index+1, sprite, pos, size)
         enemies.append(enemy)
-    player = Player(1, playerSprite, pygame.Vector2((370,580)),(50,50))
+    player = Player(1, playerSprite, pygame.Vector2((370,720)),(50,50))
     fireball = Fireball(1,fireballSprite,pygame.Vector2(player.pos.x,player.pos.y), (32,32))
     hearts = []
     for i in range(0, heartCount):
-        heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45), (48,48))
+        heart = Heart(i+1,heartSprite,pygame.Vector2(((i+1)*(32+5)-16),45), (32,32))
         hearts.append(heart)
     ball = Ball(1,ballSprite,pygame.Vector2((0,0)),(24,24))
     ball.move(-70,0)
@@ -185,7 +186,7 @@ def gameOver():
     waiting = True
     while waiting:
         game.screen.fill([53,69,172])
-        gameOverText = game.font.render("Game over", False, (0, 0, 0))
+        gameOverText = game.font.render("Game over. Press space to restart.", False, (0, 0, 0))
         textRect = gameOverText.get_rect(center=(game.SCREEN_WIDTH/2, game.SCREEN_HEIGHT/2))
         game.screen.blit(gameOverText,textRect)
         for event in pygame.event.get():
